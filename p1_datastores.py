@@ -18,14 +18,14 @@ class DsP1Users(ndb.Model, DSF):
     first_name = ndb.StringProperty(required=True)
     last_name = ndb.StringProperty(required=True)
     phone_1 = ndb.StringProperty(required=True)
-    phone_texts = ndb.StringProperty(required=True)
+    phone_texts = ndb.StringProperty(required=False)
     home_address = ndb.StringProperty(required=False)
-    email_address = ndb.StringProperty(required=True) # Marked as maybe -- ask TL
-    firebase_uid = ndb.StringProperty(required=True)
-    area_uid = ndb.StringProperty(required=True) # this UID is from DsP1AreaIdentificationCode
-    description = ndb.StringProperty(required=True)
-    preferred_radius = ndb.StringProperty(required=True)
-    account_flags = ndb.StringProperty(required=True) # see UML for details
+    email_address = ndb.StringProperty(required=False) # Marked as maybe -- ask TL
+    firebase_uid = ndb.StringProperty(required=False)
+    area_uid = ndb.StringProperty(required=False) # this UID is from DsP1AreaIdentificationCode
+    description = ndb.StringProperty(required=False)
+    preferred_radius = ndb.StringProperty(required=False)
+    account_flags = ndb.StringProperty(required=False) # see UML for details
     location_cords = ndb.GeoPtProperty(required=False) # Check with TL
 
 class DsP1CaretakerSkillsJoins:
