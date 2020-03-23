@@ -1,0 +1,26 @@
+total_storage_limit: 10G
+
+queue:
+- name: p1s1t1-create-need
+  mode: push
+  target: create-entities
+
+- name: p1s1t2-create-hashtag
+  mode: push
+  target: create-entities
+
+- name: p1s1t3-create-needed
+  mode: push
+  target: create-entities
+
+- name: p1s1t4-create-user
+  mode: push
+  target: create-entities
+
+- name: p1s1t5-create-cluster
+  mode: push
+  target: create-entities
+
+- name: p1s1t6-create-caretaker-skill
+  mode: push
+  target: create-caretaker-skill
