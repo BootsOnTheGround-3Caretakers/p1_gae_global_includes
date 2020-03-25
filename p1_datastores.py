@@ -32,16 +32,16 @@ class DsP1Users(ndb.Model, DSF):
     _rule_area_uid = [False, unicode, "len1"]
     description = ndb.StringProperty(required=False)
     _rule_description = [False, unicode, "len1"]
-    preferred_radius = ndb.StringProperty(required=False)
-    _rule_preferred_radius = [False, unicode, "len1"]
+    preferred_radius = ndb.IntegerProperty(required=False)
+    _rule_preferred_radius = [False, "bigint", "greater0"]
     account_flags = ndb.StringProperty(required=False) # see UML for details
     _rule_account_flags = [False, unicode, "len1"]
     location_cords = ndb.GeoPtProperty(required=False) # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
     _location_cords = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillsJoins:
-    user_uid = ndb.StringProperty(required=True)
-    _rule_user_uid = [True, unicode, "len1"]
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, "bigint", "greater0"]
     skill_uid = ndb.StringProperty(required=True)
     _rule_skill_uid = [True, unicode, "len1"]
     special_notes = ndb.TextProperty(required=False)
@@ -56,12 +56,12 @@ class DsP1CaretakerSkills:
     _rule_skill_type = [True, unicode, "len1"]
 
 class DsP1CaretakerSkillPointer:
-    skill_uid = ndb.StringProperty(required=True)
-    _rule_skill_uid = [True, unicode, "len1"]
+    skill_uid = ndb.IntegerProperty(required=True)
+    _rule_skill_uid = [True, "bigint", "greater0"]
 
 class DsP1SkillsSatisfiesNeeds:
-    need_uid = ndb.StringProperty(required=True)
-    _rule_need_uid = [True, unicode, "len1"]
+    need_uid = ndb.IntegerProperty(required=True)
+    _rule_need_uid = [True, "bigint", "greater0"]
 
 class DsP1Cluster:
     needer_uid = ndb.StringProperty(required=True)
@@ -72,8 +72,8 @@ class DsP1Cluster:
     _rule_user_uid = [False, unicode, "AZaz09"]
 
 class DsP1ClusterPointer:
-    cluster_uid = ndb.StringProperty(required=True)
-    _rule_cluster_uid = [True, unicode, "AZaz09"]
+    cluster_uid = ndb.IntegerProperty(required=True)
+    _rule_cluster_uid = [True, "bigint", "greater0"]
 
 class DsP1UserClusterJoins:
     user_uid = ndb.StringProperty(required=True) 
@@ -141,8 +141,8 @@ class DsP1HashTags:
     _rule_description = [False, unicode, "len1"]
 
 class DsP1HashTagPointer:
-    hashtag_uid = ndb.StringProperty(required=True)
-    _rule_hashtag_uid = [False, unicode, "len1"]
+    hashtag_uid = ndb.IntegerProperty(required=True)
+    _rule_hashtag_uid = [False, "bigint", "greater0"]
 
 class Datastores():
     user_pointers = DsP1UserPointers
