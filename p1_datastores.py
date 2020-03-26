@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
-from google.appengine.ext import ndb
+import six
+if six.PY2:
+    from google.appengine.ext import ndb
+else:
+    from google.cloud import ndb
 from datastore_functions import DatastoreFunctions as DSF
-from back_end_settings_return_codes import FunctionReturnCodes as RC
 
-import logging
 import datetime
-import string
 
 #ReplicateToDatastore must be declared first as it inherited by other Datastores
 
@@ -39,7 +40,7 @@ class DsP1Users(ndb.Model, DSF):
     location_cords = ndb.GeoPtProperty(required=False) # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
     _location_cords = [False, unicode, "len1"]
 
-class DsP1CaretakerSkillsJoins:
+class DsP1CaretakerSkillsJoins(ndb.Model, DSF):
     user_uid = ndb.IntegerProperty(required=True)
     _rule_user_uid = [True, "bigint", "greater0"]
     skill_uid = ndb.StringProperty(required=True)
@@ -47,7 +48,7 @@ class DsP1CaretakerSkillsJoins:
     special_notes = ndb.TextProperty(required=False)
     _rule_special_notes = [False, unicode, "len1"]
 
-class DsP1CaretakerSkills:
+class DsP1CaretakerSkills(ndb.Model, DSF):
     skill_name = ndb.StringProperty(required=True)
     _rule_skill_name = [True, unicode, "len1"]
     description = ndb.TextProperty(required=False)
@@ -55,27 +56,27 @@ class DsP1CaretakerSkills:
     skill_type = ndb.StringProperty(required=True)
     _rule_skill_type = [True, unicode, "len1"]
 
-class DsP1CaretakerSkillPointer:
+class DsP1CaretakerSkillPointer(ndb.Model, DSF):
     skill_uid = ndb.IntegerProperty(required=True)
     _rule_skill_uid = [True, "bigint", "greater0"]
 
-class DsP1SkillsSatisfiesNeeds:
+class DsP1SkillsSatisfiesNeeds(ndb.Model, DSF):
     need_uid = ndb.IntegerProperty(required=True)
     _rule_need_uid = [True, "bigint", "greater0"]
 
-class DsP1Cluster:
+class DsP1Cluster(ndb.Model, DSF):
     needer_uid = ndb.StringProperty(required=True)
     _rule_needer_uid = [True, unicode, "AZaz09"]
-    expiration_date = ndb.DateTimeProperty(required=True)
+    expiration_date = ndb.DateTimeProperty(required=False)
     _rule_expiration_date = [True, datetime.datetime]
     user_uid = ndb.StringProperty(required=True)
     _rule_user_uid = [False, unicode, "AZaz09"]
 
-class DsP1ClusterPointer:
+class DsP1ClusterPointer(ndb.Model, DSF):
     cluster_uid = ndb.IntegerProperty(required=True)
     _rule_cluster_uid = [True, "bigint", "greater0"]
 
-class DsP1UserClusterJoins:
+class DsP1UserClusterJoins(ndb.Model, DSF):
     user_uid = ndb.StringProperty(required=True) 
     _rule_user_uid = [True, unicode, "AZaz09"]
     cluster_uid = ndb.StringProperty(required=True)
@@ -83,30 +84,30 @@ class DsP1UserClusterJoins:
     roles = ndb.StringProperty(required=True)
     _rule_roles = [True, unicode, "len1"] # custom rule? a/b/c/d
 
-class DsP1CountryCodes:
+class DsP1CountryCodes(ndb.Model, DSF):
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"] # Country code rule?
 
-class DsP1RegionCodes:
+class DsP1RegionCodes(ndb.Model, DSF):
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"]
     description = ndb.TextProperty(required=False)
     _rule_description = [False, unicode, "len1"]
 
 
-class DsP1AreaCode:
+class DsP1AreaCode(ndb.Model, DSF):
     area_code = ndb.StringProperty(required=True)
     _rule_area_code = [True, unicode, "len1"]
 
-class DsP1AreaCodePointer:
+class DsP1AreaCodePointer(ndb.Model, DSF):
     area_uid = ndb.StringProperty(required=True)
     _rule_area_uid = [True, unicode, "len1"]
 
-class DsP1RegionCodePointer:
+class DsP1RegionCodePointer(ndb.Model, DSF):
     region_uid = ndb.StringProperty(required=True)
     _rule_region_uid = [True, unicode, "len1"]
 
-class DsP1NeederNeedsJoins:
+class DsP1NeederNeedsJoins(ndb.Model, DSF):
     need_uid = ndb.StringProperty(required=True)
     _rule_need_uid = [True, unicode, "len1"]
     user_uid = ndb.StringProperty(required=True)
@@ -116,17 +117,17 @@ class DsP1NeederNeedsJoins:
     special_requests = ndb.TextProperty(required=False)
     _rule_special_requests = [False, unicode, "len1"]
 
-class DsP1Needs:
+class DsP1Needs(ndb.Model, DSF):
     need_name = ndb.StringProperty(required=True)
     _rule_need_name = [True, unicode, "len1"] 
     requirements = ndb.TextProperty(required=False)
     _rule_requirements = [False, unicode, "len1"]
 
-class DsP1Needer:
+class DsP1Needer(ndb.Model, DSF):
     user_uid = ndb.StringProperty(required=True)
     _rule_user_uid = [True, unicode, "AZaz09"]
 
-class DsP1CreatedUidsLog:
+class DsP1CreatedUidsLog(ndb.Model, DSF):
     model_name = ndb.BooleanProperty(required=True)
     _rule_model_name = [True, unicode, "len1"]
     entity_key = ndb.StringProperty(required=True)
@@ -134,13 +135,13 @@ class DsP1CreatedUidsLog:
     creation_time = ndb.TimeProperty(required=False)
     _rule_creation_time = [False, datetime.time]
 
-class DsP1HashTags: 
+class DsP1HashTags(ndb.Model, DSF):
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"]
     description = ndb.TextProperty(required=False)
     _rule_description = [False, unicode, "len1"]
 
-class DsP1HashTagPointer:
+class DsP1HashTagPointer(ndb.Model, DSF):
     hashtag_uid = ndb.IntegerProperty(required=True)
     _rule_hashtag_uid = [False, "bigint", "greater0"]
 

@@ -74,7 +74,7 @@ class TaskArguments(object):
 class TaskNames(object):
     s1t1 = 'p1s1t1-create-need'
     s1t2 = 'p1s1t2-create-hashtag'
-    s1t3 = 'p1s1t3-create-needed'
+    s1t3 = 'p1s1t3-create-needer'
     s1t4 = 'p1s1t4-create-user'
     s1t5 = 'p1s1t5-create-cluster'
     s1t6 = 'p1s1t6-create-caretaker-skill'
@@ -135,13 +135,13 @@ class CreateEntities(ServiceInformation):
     create_hashtag.ACL_rules = ""
     create_hashtag.user_uid = 1
 
-    create_needed = TaskInformation()
-    create_needed.id = "t3"
-    create_needed.method = "POST"
-    create_needed.name = "p1s1t3-create-needed"
-    create_needed.url = "/p1s1t3-create-needed"
-    create_needed.ACL_rules = ""
-    create_needed.user_uid = 1
+    create_needer = TaskInformation()
+    create_needer.id = "t3"
+    create_needer.method = "POST"
+    create_needer.name = "p1s1t3-create-needer"
+    create_needer.url = "/p1s1t3-create-needer"
+    create_needer.ACL_rules = ""
+    create_needer.user_uid = 1
 
     create_user = TaskInformation()
     create_user.id = "t4"
@@ -168,7 +168,7 @@ class CreateEntities(ServiceInformation):
     create_caretaker_skill.user_uid = 1
 
     task_list = [
-        create_need, create_hashtag, create_needed, create_user, create_cluster, create_caretaker_skill
+        create_need, create_hashtag, create_needer, create_user, create_cluster, create_caretaker_skill
     ]
 
 
