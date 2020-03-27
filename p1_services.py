@@ -49,7 +49,6 @@ class TaskArguments(object):
     s3t3_last_name = 'p1s3t3_last_name'
     s3t3_phone_number = 'p1s3t3_phone_number'
 
-
     s3t4_user_uid = 'p1s3t4_user_uid'
     s3t4_first_name = 'p1s3t4_first_name'
     s3t4_last_name = 'p1s3t4_last_name'
@@ -71,6 +70,8 @@ class TaskArguments(object):
     s4t1_task_sequence_list = 'p1s4t1_task_sequence_list'
     s4t1_api_key = 'p1s4t1_api_key'
 
+    s8t1_fields = 'p1s8t1_fields'
+
 
 class TaskNames(object):
     s1t1 = 'p1s1t1-create-need'
@@ -86,6 +87,9 @@ class TaskNames(object):
     s3t4 = 'p1s3t4-modify-user-information'
 
     s4t1 = 'p1s4t1-create-external-transaction'
+
+    s8t1 = 'p1s8t1-push-firebase-change'
+    s8t2 = 'p1s8t2-mass-firebase-replication'
 
 
 class TaskInformation(object):
@@ -233,10 +237,35 @@ class CreateTransaction(ServiceInformation):
     task_list = [create_external_transaction]
 
 
+class FirebaseReplication(ServiceInformation):
+    name = "firebase-replication"
+    service_id = "s8"
+
+    push_firebase_change = TaskInformation()
+    push_firebase_change.id = "t1"
+    push_firebase_change.method = "POST"
+    push_firebase_change.name = "p1s1t1-push-firebase-change"
+    push_firebase_change.url = "/p1s1t1-push-firebase-change"
+    push_firebase_change.ACL_rules = ""
+    push_firebase_change.user_uid = 1
+
+    push_mass_firebase_changes = TaskInformation()
+    push_mass_firebase_changes.id = "t1"
+    push_mass_firebase_changes.method = "POST"
+    push_mass_firebase_changes.name = "p1s8t2-mass-firebase-replication"
+    push_mass_firebase_changes.url = "/p1s8t2-mass-firebase-replication"
+    push_mass_firebase_changes.ACL_rules = ""
+    push_mass_firebase_changes.user_uid = 1
+
+    task_list = [
+        push_firebase_change, push_mass_firebase_changes,
+    ]
+
+
 class Services(object):
     create_entities = CreateEntities
     create_transaction = CreateTransaction
     web_request = WebRequests
+    firebase_replication = FirebaseReplication
 
-
-    service_list = [create_entities, create_transaction,web_request]
+    service_list = [create_entities, create_transaction, web_request, firebase_replication]

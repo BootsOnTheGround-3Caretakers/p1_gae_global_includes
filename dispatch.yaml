@@ -15,3 +15,7 @@ dispatch:
 #    service: json-requests
 
 
+  - url: "*/p1s8*"
+    service: firebase-replication
+
+
