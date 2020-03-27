@@ -1,9 +1,17 @@
 from __future__ import unicode_literals
+
 import six
 if six.PY2:
     from google.appengine.ext import ndb
+    from google.appengine.api import namespace_manager
 else:
     from google.cloud import ndb
+    namespace_manager = None
+
+from six import integer_types
+if len(integer_types) == 1:
+    long = integer_types[0]
+from six import text_type as unicode
 from datastore_functions import DatastoreFunctions as DSF
 
 import datetime
