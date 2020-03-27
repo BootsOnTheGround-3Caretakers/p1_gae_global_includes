@@ -49,6 +49,7 @@ class TaskArguments(object):
     s3t3_last_name = 'p1s3t3_last_name'
     s3t3_phone_number = 'p1s3t3_phone_number'
 
+
     s3t4_user_uid = 'p1s3t4_user_uid'
     s3t4_first_name = 'p1s3t4_first_name'
     s3t4_last_name = 'p1s3t4_last_name'
@@ -235,5 +236,7 @@ class CreateTransaction(ServiceInformation):
 class Services(object):
     create_entities = CreateEntities
     create_transaction = CreateTransaction
+    web_request = WebRequests
 
-    service_list = [create_entities, create_transaction]
+
+    service_list = [create_entities, create_transaction,web_request]
