@@ -37,6 +37,11 @@ class TaskArguments(object):
     s1t6_skill_type = 'p1s1t6_skill_type'
     s1t6_certs = 'p1s1t6_certs'
 
+    s2t4_user_uid = 'p1s2t4_user_uid'
+    s2t4_needer_uid = 'p1s2t4_needer_uid'
+    s2t4_need_uid = 'p1s2t4_need_uid'
+    s2t4_special_requests = 'p1s2t4_special_requests'
+
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
 
@@ -80,6 +85,8 @@ class TaskNames(object):
     s1t4 = 'p1s1t4-create-user'
     s1t5 = 'p1s1t5-create-cluster'
     s1t6 = 'p1s1t6-create-caretaker-skill'
+
+    s2t4 = 'p1s2t4-add-modify-need-to-needer'
 
     s3t1 = 'p1s3t1-create-need'
     s3t2 = 'p1s3t2-assign-need-to-needer'
@@ -177,6 +184,23 @@ class CreateEntities(ServiceInformation):
     ]
 
 
+class ModifyJoins(ServiceInformation):
+    name = "modify-joins"
+    service_id = "s2"
+
+    add_modify_need_to_needer = TaskInformation()
+    add_modify_need_to_needer.id = "t1"
+    add_modify_need_to_needer.method = "POST"
+    add_modify_need_to_needer.name = "p1s2t4-add-modify-need-to-needer"
+    add_modify_need_to_needer.url = "/p1s2t4-add-modify-need-to-needer"
+    add_modify_need_to_needer.ACL_rules = ""
+    add_modify_need_to_needer.user_uid = 1
+
+    task_list = [
+        add_modify_need_to_needer
+    ]
+
+
 class WebRequests(ServiceInformation):
     name = "web-requests"
     service_id = "s3"
@@ -264,8 +288,9 @@ class FirebaseReplication(ServiceInformation):
 
 class Services(object):
     create_entities = CreateEntities
+    modify_joins = ModifyJoins
     create_transaction = CreateTransaction
     web_request = WebRequests
     firebase_replication = FirebaseReplication
 
-    service_list = [create_entities, create_transaction, web_request, firebase_replication]
+    service_list = [create_entities, modify_joins, create_transaction, web_request, firebase_replication]
