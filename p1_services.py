@@ -75,7 +75,7 @@ class TaskArguments(object):
     s4t1_task_sequence_list = 'p1s4t1_task_sequence_list'
     s4t1_api_key = 'p1s4t1_api_key'
 
-    s8t1_fields = 'p1s8t1_fields'
+    s8t3_fields = 'p1s8t3_fields'
 
 
 class TaskNames(object):
@@ -266,18 +266,18 @@ class FirebaseReplication(ServiceInformation):
     service_id = "s8"
 
     push_firebase_change = TaskInformation()
-    push_firebase_change.id = "t1"
+    push_firebase_change.id = "t3"
     push_firebase_change.method = "POST"
-    push_firebase_change.name = "p1s1t1-push-firebase-change"
-    push_firebase_change.url = "/p1s1t1-push-firebase-change"
+    push_firebase_change.name = "p1s8t3-push-firebase-change"
+    push_firebase_change.url = "/p1s8t3-push-firebase-change"
     push_firebase_change.ACL_rules = ""
     push_firebase_change.user_uid = 1
 
     push_mass_firebase_changes = TaskInformation()
-    push_mass_firebase_changes.id = "t1"
+    push_mass_firebase_changes.id = "t4"
     push_mass_firebase_changes.method = "POST"
-    push_mass_firebase_changes.name = "p1s8t2-mass-firebase-replication"
-    push_mass_firebase_changes.url = "/p1s8t2-mass-firebase-replication"
+    push_mass_firebase_changes.name = "p1s8t4-mass-firebase-replication"
+    push_mass_firebase_changes.url = "/p1s8t4-mass-firebase-replication"
     push_mass_firebase_changes.ACL_rules = ""
     push_mass_firebase_changes.user_uid = 1
 
