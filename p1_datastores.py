@@ -76,10 +76,12 @@ class ReplicateToFirebase(object):
 
         kind_names = [
             "DsP1Users",
+            "DsP1Needs",
         ]
 
         kind_functions = [
             self.__DsP1Users,
+            self.__DsP1Needs,
         ]
 
         ## process each entity and add it to the list to send to firebase
@@ -294,6 +296,98 @@ class ReplicateToFirebase(object):
         for data in debug_data[debug_data_count:]:
             if data['success'] is not True:
                 return_msg += "setting user_record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
+    def __DsP1Needs(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1Needs "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of needs record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+
+        try:
+            needs_uid = unicode(entity_id)
+        except Exception as e:
+            return_msg += "failed to parse user_uid from entity id:%s with exception:%s" % (entity_id, e)
+            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        firebase_location = "needs_last_updated/"
+
+        #format for each entry is [folder_path,key,value]
+        simple_entries = [
+            [needs_uid, FF.keys.last_updated, unicode(int(time.time()))],
+        ]
+
+        ## process all the simple entries
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> process all the simple entries
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] is not True:
+                return_msg += "setting needs record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_location = "needs_meta_data/{}".format(needs_uid)
+        simple_entries = [
+            ["", FF.keys.name, entity.need_name],
+            ["", FF.keys.requirements, entity.requirements],
+        ]
+
+        ## process all the simple entries
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> process all the simple entries
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] is not True:
+                return_msg += "setting needs record or type record failed"
                 return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
                         'firebase_fields': firebase_fields}
 
