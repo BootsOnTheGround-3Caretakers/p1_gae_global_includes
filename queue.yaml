@@ -11,12 +11,10 @@ queue:
   target: create-entities
   rate: 1/s
 
-
-- name: p1s1t3-create-needed
+- name: p1s1t3-create-needer
   mode: push
   target: create-entities
   rate: 1/s
-
 
 - name: p1s1t4-create-user
   mode: push
@@ -29,6 +27,11 @@ queue:
   rate: 1/s
 
 - name: p1s1t6-create-caretaker-skill
+  mode: push
+  target: create-caretaker-skill
+  rate: 1/s
+
+- name: p1s2t4-add-modify-need-to-needer
   mode: push
   target: create-caretaker-skill
   rate: 1/s
