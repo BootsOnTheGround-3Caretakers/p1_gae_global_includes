@@ -305,7 +305,7 @@ class DsP1UserPointers(ndb.Model, DSF):
     user_uid = ndb.StringProperty(required=True)
     _rule_user_uid = [True, unicode, "AZaz09"]
 
-class DsP1Users(ndb.Model, DSF,ReplicateToFirebaseFlag,ReplicateToFirebase):
+class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     first_name = ndb.StringProperty(required=True)
     _rule_first_name = [True, unicode, "len1"]
     last_name = ndb.StringProperty(required=True)
@@ -331,7 +331,7 @@ class DsP1Users(ndb.Model, DSF,ReplicateToFirebaseFlag,ReplicateToFirebase):
     location_cords = ndb.GeoPtProperty(required=False) # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
     _location_cords = [False, unicode, "len1"]
 
-class DsP1CaretakerSkillsJoins(ndb.Model, DSF):
+class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.IntegerProperty(required=True)
     _rule_user_uid = [True, "bigint", "greater0"]
     skill_uid = ndb.StringProperty(required=True)
@@ -339,7 +339,7 @@ class DsP1CaretakerSkillsJoins(ndb.Model, DSF):
     special_notes = ndb.TextProperty(required=False)
     _rule_special_notes = [False, unicode, "len1"]
 
-class DsP1CaretakerSkills(ndb.Model, DSF):
+class DsP1CaretakerSkills(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     skill_name = ndb.StringProperty(required=True)
     _rule_skill_name = [True, unicode, "len1"]
     description = ndb.TextProperty(required=False)
@@ -351,7 +351,7 @@ class DsP1CaretakerSkillPointer(ndb.Model, DSF):
     skill_uid = ndb.IntegerProperty(required=True)
     _rule_skill_uid = [True, "bigint", "greater0"]
 
-class DsP1SkillsSatisfiesNeeds(ndb.Model, DSF):
+class DsP1SkillsSatisfiesNeeds(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     need_uid = ndb.IntegerProperty(required=True)
     _rule_need_uid = [True, "bigint", "greater0"]
 
@@ -375,7 +375,7 @@ class DsP1UserClusterJoins(ndb.Model, DSF):
     roles = ndb.StringProperty(required=True)
     _rule_roles = [True, unicode, "len1"] # custom rule? a/b/c/d
 
-class DsP1CountryCodes(ndb.Model, DSF):
+class DsP1CountryCodes(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"] # Country code rule?
 
@@ -388,15 +388,15 @@ class DsP1RegionCodes(ndb.Model, DSF):
     _rule_description = [False, unicode, "len1"]
 
 
-class DsP1AreaCode(ndb.Model, DSF):
+class DsP1AreaCode(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     area_code = ndb.StringProperty(required=True)
     _rule_area_code = [True, unicode, "len1"]
 
-class DsP1AreaCodePointer(ndb.Model, DSF):
+class DsP1AreaCodePointer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     area_uid = ndb.StringProperty(required=True)
     _rule_area_uid = [True, unicode, "len1"]
 
-class DsP1RegionCodePointer(ndb.Model, DSF):
+class DsP1RegionCodePointer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     region_uid = ndb.StringProperty(required=True)
     _rule_region_uid = [True, unicode, "len1"]
 
@@ -410,7 +410,7 @@ class DsP1NeederNeedsJoins(ndb.Model, DSF):
     special_requests = ndb.TextProperty(required=False)
     _rule_special_requests = [False, unicode, "len1"]
 
-class DsP1Needs(ndb.Model, DSF):
+class DsP1Needs(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     need_name = ndb.StringProperty(required=True)
     _rule_need_name = [True, unicode, "len1"] 
     requirements = ndb.TextProperty(required=False)
@@ -428,7 +428,7 @@ class DsP1CreatedUidsLog(ndb.Model, DSF):
     creation_time = ndb.TimeProperty(required=False)
     _rule_creation_time = [False, datetime.time]
 
-class DsP1HashTags(ndb.Model, DSF):
+class DsP1HashTags(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"]
     description = ndb.TextProperty(required=False)
