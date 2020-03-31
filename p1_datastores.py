@@ -380,6 +380,8 @@ class DsP1CountryCodes(ndb.Model, DSF):
     _rule_name = [True, unicode, "len1"] # Country code rule?
 
 class DsP1RegionCodes(ndb.Model, DSF):
+    region_code = ndb.StringProperty(required=True)
+    _rule_region_code = [True, unicode, "len1"]
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"]
     description = ndb.TextProperty(required=False)
