@@ -37,10 +37,37 @@ class TaskArguments(object):
     s1t6_skill_type = 'p1s1t6_skill_type'
     s1t6_certs = 'p1s1t6_certs'
 
+    s2t1_cluster_uid = 'p1s2t1_cluster_uid'
+    s2t1_user_uid = 'p1s2t1_user_uid'
+    s2t1_user_roles = 'p1s2t1_user_roles'
+
+    s2t2_cluster_uid = 'p1s2t2_cluster_uid'
+    s2t2_user_uid = 'p1s2t2_user_uid'
+
+    s2t3_user_uid = 'p1s2t3_user_uid'
+    s2t3_skill_uid = 'p1s2t3_skill_uid'
+    s2t3_special_notes = 'p1s2t3_special_notes'
+
     s2t4_user_uid = 'p1s2t4_user_uid'
     s2t4_needer_uid = 'p1s2t4_needer_uid'
     s2t4_need_uid = 'p1s2t4_need_uid'
     s2t4_special_requests = 'p1s2t4_special_requests'
+
+    s2t5_user_uid = 'p1s2t5_user_uid'
+    s2t5_need_uid = 'p1s2t5_need_uid'
+    s2t5_needer_uid = 'p1s2t5_needer_uid'
+
+    s2t6_user_uid = 'p1s2t6_user_uid'
+    s2t6_needer_uid = 'p1s2t6_needer_uid'
+
+    s2t7_user_uid = 'p1s2t7_user_uid'
+    s2t7_hashtag_uid = 'p1s2t7_hashtag_uid'
+
+    s2t8_user_uid = 'p1s2t8_user_uid'
+    s2t8_hashtag_uid = 'p1s2t8_hashtag_uid'
+
+    s2t9_user_uid = 'p1s2t9_user_uid'
+    s2t9_hashtag_uid = 'p1s2t9_hashtag_uid'
 
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
@@ -86,7 +113,15 @@ class TaskNames(object):
     s1t5 = 'p1s1t5-create-cluster'
     s1t6 = 'p1s1t6-create-caretaker-skill'
 
+    s2t1 = 'p1s2t1-add-modify-cluster-user'
+    s2t2 = 'p1s2t2-remove-user-from-cluster'
+    s2t3 = 'p1s2t3-add-modify-user-skill'
     s2t4 = 'p1s2t4-add-modify-need-to-needer'
+    s2t5 = 'p1s2t5-remove-need-from-needer'
+    s2t6 = 'p1s2t6-remove-needer-from-user'
+    s2t7 = 'p1s2t7-assign-hashtag-to-user'
+    s2t8 = 'p1s2t8-remove-hashtag-from-user'
+    s2t9 = 'p1s2t9-remove-skill-from-user'
 
     s3t1 = 'p1s3t1-create-need'
     s3t2 = 'p1s3t2-assign-need-to-needer'
@@ -188,16 +223,82 @@ class ModifyJoins(ServiceInformation):
     name = "modify-joins"
     service_id = "s2"
 
+    add_modify_cluster_user = TaskInformation()
+    add_modify_cluster_user.id = "t1"
+    add_modify_cluster_user.method = "POST"
+    add_modify_cluster_user.name = "p1s2t1-add-modify-cluster-user"
+    add_modify_cluster_user.url = "/p1s2t1-add-modify-cluster-user"
+    add_modify_cluster_user.ACL_rules = ""
+    add_modify_cluster_user.user_uid = 1
+
+    remove_user_from_cluster = TaskInformation()
+    remove_user_from_cluster.id = "t2"
+    remove_user_from_cluster.method = "POST"
+    remove_user_from_cluster.name = "p1s2t2-remove-user-from-cluster"
+    remove_user_from_cluster.url = "/p1s2t2-remove-user-from-cluster"
+    remove_user_from_cluster.ACL_rules = ""
+    remove_user_from_cluster.user_uid = 1
+
+    add_modify_user_skill = TaskInformation()
+    add_modify_user_skill.id = "t3"
+    add_modify_user_skill.method = "POST"
+    add_modify_user_skill.name = "p1s2t3-add-modify-user-skill"
+    add_modify_user_skill.url = "/p1s2t3-add-modify-user-skill"
+    add_modify_user_skill.ACL_rules = ""
+    add_modify_user_skill.user_uid = 1
+
     add_modify_need_to_needer = TaskInformation()
-    add_modify_need_to_needer.id = "t1"
+    add_modify_need_to_needer.id = "t4"
     add_modify_need_to_needer.method = "POST"
     add_modify_need_to_needer.name = "p1s2t4-add-modify-need-to-needer"
     add_modify_need_to_needer.url = "/p1s2t4-add-modify-need-to-needer"
     add_modify_need_to_needer.ACL_rules = ""
     add_modify_need_to_needer.user_uid = 1
 
+    remove_need_from_needer = TaskInformation()
+    remove_need_from_needer.id = "t5"
+    remove_need_from_needer.method = "POST"
+    remove_need_from_needer.name = "p1s2t5-remove-need-from-needer"
+    remove_need_from_needer.url = "/p1s2t5-remove-need-from-needer"
+    remove_need_from_needer.ACL_rules = ""
+    remove_need_from_needer.user_uid = 1
+
+    remove_needer_from_user = TaskInformation()
+    remove_needer_from_user.id = "t6"
+    remove_needer_from_user.method = "POST"
+    remove_needer_from_user.name = "p1s2t6-remove-needer-from-user"
+    remove_needer_from_user.url = "/p1s2t6-remove-needer-from-user"
+    remove_needer_from_user.ACL_rules = ""
+    remove_needer_from_user.user_uid = 1
+
+    assign_hashtag_to_user = TaskInformation()
+    assign_hashtag_to_user.id = "t7"
+    assign_hashtag_to_user.method = "POST"
+    assign_hashtag_to_user.name = "p1s2t7-assign-hashtag-to-user"
+    assign_hashtag_to_user.url = "/p1s2t7-assign-hashtag-to-user"
+    assign_hashtag_to_user.ACL_rules = ""
+    assign_hashtag_to_user.user_uid = 1
+
+    remove_hashtag_from_user = TaskInformation()
+    remove_hashtag_from_user.id = "t8"
+    remove_hashtag_from_user.method = "POST"
+    remove_hashtag_from_user.name = "p1s2t8-remove-hashtag-from-user"
+    remove_hashtag_from_user.url = "/p1s2t8-remove-hashtag-from-user"
+    remove_hashtag_from_user.ACL_rules = ""
+    remove_hashtag_from_user.user_uid = 1
+
+    remove_skill_from_user = TaskInformation()
+    remove_skill_from_user.id = "t9"
+    remove_skill_from_user.method = "POST"
+    remove_skill_from_user.name = "p1s2t9-remove-skill-from-user"
+    remove_skill_from_user.url = "/p1s2t9-remove-skill-from-user"
+    remove_skill_from_user.ACL_rules = ""
+    remove_skill_from_user.user_uid = 1
+
     task_list = [
-        add_modify_need_to_needer
+        add_modify_cluster_user, remove_user_from_cluster, add_modify_user_skill, add_modify_need_to_needer,
+        remove_need_from_needer, remove_needer_from_user, assign_hashtag_to_user, remove_hashtag_from_user,
+        remove_skill_from_user,
     ]
 
 
