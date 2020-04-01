@@ -67,7 +67,7 @@ class TaskArguments(object):
     s2t8_hashtag_uid = 'p1s2t8_hashtag_uid'
 
     s2t9_user_uid = 'p1s2t9_user_uid'
-    s2t9_hashtag_uid = 'p1s2t9_hashtag_uid'
+    s2t9_skill_uid = 'p1s2t9_skill_uid'
 
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
