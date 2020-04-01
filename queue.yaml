@@ -28,12 +28,52 @@ queue:
 
 - name: p1s1t6-create-caretaker-skill
   mode: push
-  target: create-caretaker-skill
+  target: create-entities
+  rate: 1/s
+
+- name: p1s2t1-add-modify-cluster-user
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t2-remove-user-from-cluster
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t3-add-modify-user-skill
+  mode: push
+  target: modify-joins
   rate: 1/s
 
 - name: p1s2t4-add-modify-need-to-needer
   mode: push
-  target: create-caretaker-skill
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t5-remove-need-from-needer
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t6-remove-needer-from-user
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t7-assign-hashtag-to-user
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t8-remove-hashtag-from-user
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
+- name: p1s2t9-remove-skill-from-user
+  mode: push
+  target: modify-joins
   rate: 1/s
 
 - name: p1s8t3-push-firebase-change
