@@ -972,7 +972,7 @@ class ReplicateToFirebase(object):
         user_keys = call_result['fetch_result']
         #</end> get users in the area
 
-        # get clusters of the user
+        # get clusters of the users
         cluster_joins_query = DsP1UserClusterJoins.query(
             DsP1UserClusterJoins.user_uid.IN([unicode(user_key.id()) for user_key in user_keys])
         )
@@ -984,7 +984,7 @@ class ReplicateToFirebase(object):
                 'firebase_fields': firebase_fields
             }
         cluster_joins = call_result['fetch_result']
-        #</end> get clusters of the user
+        #</end> get clusters of the users
 
         if cluster_joins:
             firebase_location = "cluster_search_data/{}/{}/{}/".format(country_uid, region_uid, area_uid)
@@ -1016,7 +1016,45 @@ class ReplicateToFirebase(object):
                 generated_fields.append(call_result['field'])
                 debug_data_count = debug_data_count + 2
 
-        # BOOKMARK
+        # get skill joins of the users
+        skill_joins_query = DsP1CaretakerSkillsJoins.query(
+            DsP1CaretakerSkillsJoins.user_uid.IN([unicode(user_key.id()) for user_key in user_keys])
+        )
+        call_result = DSF.kfetch(skill_joins_query, keys_only=True)
+        if call_result['success'] != RC.success:
+            return_msg += "fetch of skill_joins failed"
+            return {
+                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
+                'firebase_fields': firebase_fields
+            }
+        skill_joins = call_result['fetch_result']
+        #</end> get skill joins of the users
+
+        if skill_joins:
+            firebase_location = "available_skills_search_data/{}/{}/{}/".format(country_uid, region_uid, area_uid)
+
+            simple_entries = []
+            for skill_join in skill_joins:
+                skill_join_uid = unicode(skill_join.key.id())
+                simple_entries.append([skill_join_uid, FF.keys.skill_join_uid, skill_join_uid])
+                simple_entries.append([skill_join_uid, FF.keys.total_capacity, skill_join.total_capacity])
+
+            for entry in simple_entries:
+                if entry[2] is None:
+                    continue
+
+                firebase_entry = FF()
+                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                            FF.object_types.object,
+                                                            FF.functions.update,
+                                                            entry[2],
+                                                            entry[1])
+                debug_data.append(call_result)
+                call_result = firebase_entry.toDict()
+                debug_data.append(call_result)
+                generated_fields.append(call_result['field'])
+                debug_data_count = debug_data_count + 2
+
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
             if data['success'] != RC.success:
@@ -1064,12 +1102,14 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     _location_cords = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    user_uid = ndb.IntegerProperty(required=True)
-    _rule_user_uid = [True, "bigint", "greater0"]
+    user_uid = ndb.StringProperty(required=True)
+    _rule_user_uid = [True, unicode, "len1"]
     skill_uid = ndb.StringProperty(required=True)
     _rule_skill_uid = [True, unicode, "len1"]
     special_notes = ndb.TextProperty(required=False)
     _rule_special_notes = [False, unicode, "len1"]
+    total_capacity = ndb.IntegerProperty(required=True, default=1)
+    _rule_total_capacity = [True, "bigint", "greater0"]
 
 class DsP1CaretakerSkills(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     skill_name = ndb.StringProperty(required=True)
