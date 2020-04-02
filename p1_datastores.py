@@ -85,6 +85,7 @@ class ReplicateToFirebase(object):
             "DsP1RegionCodes",
             "DsP1AreaCode",
             "DsP1CaretakerSkillsJoins",
+            "DsP1SkillJoinsUnusedCapacityNow",
         ]
 
         kind_functions = [
@@ -98,6 +99,7 @@ class ReplicateToFirebase(object):
             self.__DsP1RegionCodes,
             self.__DsP1AreaCode,
             self.__DsP1CaretakerSkillsJoins,
+            self.__DsP1SkillJoinsUnusedCapacityNow,
         ]
 
         ## process each entity and add it to the list to send to firebase
@@ -1063,7 +1065,7 @@ class ReplicateToFirebase(object):
 
         simple_entries = [
             [entity_id, FF.keys.skill_join_uid, entity_id],
-            [entity_id, FF.keys.total_capacity, entity_id.total_capacity],
+            [entity_id, FF.keys.total_capacity, entity.total_capacity],
         ]
 
         for entry in simple_entries:
@@ -1085,7 +1087,90 @@ class ReplicateToFirebase(object):
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
             if data['success'] != RC.success:
-                return_msg += "setting RegionCode record or type record failed"
+                return_msg += "setting SkillJoins record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
+    def __DsP1SkillJoinsUnusedCapacityNow(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1SkillJoinsUnusedCapacityNow "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of SkillJoinsUnusedCapacityNow record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+
+        # get skill joins
+        joins_query = DsP1CaretakerSkillsJoins.query(DsP1CaretakerSkillsJoins.skill_uid == entity_id)
+        call_result = DSF.kfetch(joins_query)
+        if call_result['success'] != RC.success:
+            return_msg += "fetch of skill joins failed"
+            return {
+                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
+                'firebase_fields': firebase_fields
+            }
+        skill_joins = call_result['fetch_result']
+        #</end> get skill joins
+
+        # get users
+        user_keys = []
+        for skill_join in skill_joins:
+            user_keys.append(ndb.Key(DsP1Users._get_kind(), long(skill_join.user_uid)))
+
+        call_result = DSF.kget_multi(user_keys)
+        debug_data.append(call_result)
+        if call_result['success'] != RC.success:
+            return_msg += "failed to get users of skill {}".format(entity_id)
+            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+        #</end> get users
+
+        users = call_result['get_result']
+        for user in users:
+            if not user:
+                continue
+
+            firebase_location = "available_skills_search_data/{}/{}/{}/".format(
+                user.country_uid, user.region_uid, user.area_uid
+            )
+
+            simple_entries = [
+                ["{}|{}".format(user.key.id(), entity_id), FF.keys.unused_capacity_now, entity.unused_capacity_now],
+            ]
+
+            for entry in simple_entries:
+                if entry[2] is None:
+                    continue
+
+                firebase_entry = FF()
+                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                            FF.object_types.object,
+                                                            FF.functions.update,
+                                                            entry[2],
+                                                            entry[1])
+                debug_data.append(call_result)
+                call_result = firebase_entry.toDict()
+                debug_data.append(call_result)
+                generated_fields.append(call_result['field'])
+                debug_data_count = debug_data_count + 2
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] != RC.success:
+                return_msg += "setting unused_capacity_now record or type record failed"
                 return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
                         'firebase_fields': firebase_fields}
 
@@ -1147,12 +1232,18 @@ class DsP1CaretakerSkills(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFi
     _rule_skill_type = [True, unicode, "len1"]
 
 class DsP1CaretakerSkillPointer(ndb.Model, DSF):
-    skill_uid = ndb.IntegerProperty(required=True)
-    _rule_skill_uid = [True, "bigint", "greater0"]
+    skill_uid = ndb.StringProperty(required=True)
+    _rule_skill_uid = [True, unicode, "len1"]
 
 class DsP1SkillsSatisfiesNeeds(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    need_uid = ndb.IntegerProperty(required=True)
-    _rule_need_uid = [True, "bigint", "greater0"]
+    need_uid = ndb.StringProperty(required=True)
+    _rule_need_uid = [True, unicode, "len1"]
+
+class DsP1SkillJoinsUnusedCapacityNow(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
+    skill_uid = ndb.StringProperty(required=True)
+    _rule_skill_uid = [True, unicode, "len1"]
+    unused_capacity_now = ndb.IntegerProperty(required=True)
+    _unused_capacity_now = [True, "bigint", "greater0"]
 
 class DsP1Cluster(ndb.Model, DSF):
     needer_uid = ndb.StringProperty(required=True)
@@ -1244,6 +1335,7 @@ class Datastores():
     caretaker_skills = DsP1CaretakerSkills
     caretaker_skill_pointer = DsP1CaretakerSkillPointer
     skills_satisfies_needs = DsP1SkillsSatisfiesNeeds
+    skill_joins_unused_capacity_now = DsP1SkillJoinsUnusedCapacityNow
     cluster = DsP1Cluster
     cluster_pointer = DsP1ClusterPointer
     cluster_joins = DsP1UserClusterJoins
@@ -1260,7 +1352,9 @@ class Datastores():
     hashtag_pointer = DsP1HashTagPointer
 
     # used for deleting the entire datastore, just add the variable name to this list when you add a new datastore
-    datastore_list = [user_pointers, users, caretaker_skills_joins,caretaker_skills, caretaker_skill_pointer,
-     skills_satisfies_needs, cluster, cluster_pointer, cluster_joins,country_codes, region_codes, area_code,
-      area_code_pointer,region_code_pointer, needer_needs_joins, needs, needer, created_uids_log, hashtags,
-       hashtag_pointer]
+    datastore_list = [
+        user_pointers, users, caretaker_skills_joins,caretaker_skills, caretaker_skill_pointer,
+        skills_satisfies_needs, skill_joins_unused_capacity_now, cluster, cluster_pointer, cluster_joins,
+        country_codes, region_codes, area_code, area_code_pointer, region_code_pointer,
+        needer_needs_joins, needs, needer, created_uids_log, hashtags, hashtag_pointer
+    ]
