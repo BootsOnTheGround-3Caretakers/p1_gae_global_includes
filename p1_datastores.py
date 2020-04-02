@@ -84,6 +84,7 @@ class ReplicateToFirebase(object):
             "DsP1CountryCodes",
             "DsP1RegionCodes",
             "DsP1AreaCode",
+            "DsP1CaretakerSkillsJoins",
         ]
 
         kind_functions = [
@@ -96,6 +97,7 @@ class ReplicateToFirebase(object):
             self.__DsP1CountryCodes,
             self.__DsP1RegionCodes,
             self.__DsP1AreaCode,
+            self.__DsP1CaretakerSkillsJoins,
         ]
 
         ## process each entity and add it to the list to send to firebase
@@ -1016,44 +1018,69 @@ class ReplicateToFirebase(object):
                 generated_fields.append(call_result['field'])
                 debug_data_count = debug_data_count + 2
 
-        # get skill joins of the users
-        skill_joins_query = DsP1CaretakerSkillsJoins.query(
-            DsP1CaretakerSkillsJoins.user_uid.IN([unicode(user_key.id()) for user_key in user_keys])
-        )
-        call_result = DSF.kfetch(skill_joins_query, keys_only=True)
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] != RC.success:
+                return_msg += "setting RegionCode record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
+    def __DsP1CaretakerSkillsJoins(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1CaretakerSkillsJoins "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
         if call_result['success'] != RC.success:
-            return_msg += "fetch of skill_joins failed"
-            return {
-                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
-                'firebase_fields': firebase_fields
-            }
-        skill_joins = call_result['fetch_result']
-        #</end> get skill joins of the users
+            return_msg += "get of CaretakerSkillsJoins record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
 
-        if skill_joins:
-            firebase_location = "available_skills_search_data/{}/{}/{}/".format(country_uid, region_uid, area_uid)
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
 
-            simple_entries = []
-            for skill_join in skill_joins:
-                skill_join_uid = unicode(skill_join.key.id())
-                simple_entries.append([skill_join_uid, FF.keys.skill_join_uid, skill_join_uid])
-                simple_entries.append([skill_join_uid, FF.keys.total_capacity, skill_join.total_capacity])
+        key_pairs = entity.key.pairs()
+        user_key = ndb.Key(*key_pairs[0])
+        call_result = DSF.kget(user_key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of User record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
 
-            for entry in simple_entries:
-                if entry[2] is None:
-                    continue
+        user = call_result['get_result']
 
-                firebase_entry = FF()
-                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                            FF.object_types.object,
-                                                            FF.functions.update,
-                                                            entry[2],
-                                                            entry[1])
-                debug_data.append(call_result)
-                call_result = firebase_entry.toDict()
-                debug_data.append(call_result)
-                generated_fields.append(call_result['field'])
-                debug_data_count = debug_data_count + 2
+        firebase_location = "available_skills_search_data/{}/{}/{}/".format(
+            user.country_uid, user.region_uid, user.area_uid
+        )
+
+        simple_entries = [
+            [entity_id, FF.keys.skill_join_uid, entity_id],
+            [entity_id, FF.keys.total_capacity, entity_id.total_capacity],
+        ]
+
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
