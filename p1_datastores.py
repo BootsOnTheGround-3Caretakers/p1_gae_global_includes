@@ -346,30 +346,7 @@ class ReplicateToFirebase(object):
             return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
                     'firebase_fields': firebase_fields}
 
-        firebase_location = "needs_last_updated/"
 
-        #format for each entry is [folder_path,key,value]
-        simple_entries = [
-            [needs_uid, FF.keys.last_updated, unicode(int(time.time()))],
-        ]
-
-        ## process all the simple entries
-        for entry in simple_entries:
-            if entry[2] is None:
-                continue
-
-            firebase_entry = FF()
-            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                        FF.object_types.object,
-                                                        FF.functions.update,
-                                                        entry[2],
-                                                        entry[1])
-            debug_data.append(call_result)
-            call_result = firebase_entry.toDict()
-            debug_data.append(call_result)
-            generated_fields.append(call_result['field'])
-            debug_data_count = debug_data_count + 2
-        ##</end> process all the simple entries
 
         firebase_location = "needs_meta_data/{}".format(needs_uid)
         simple_entries = [
@@ -394,6 +371,21 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
+
+        ## set last updated flag last
+        firebase_entry = FF()
+        call_result = firebase_entry.setFieldValues("needs_last_updated/",
+                                                    FF.object_types.object,
+                                                    FF.functions.update,
+                                                    unicode(int(time.time())))
+        debug_data.append(call_result)
+        call_result = firebase_entry.setManualKey(needs_uid)
+        debug_data.append(call_result)
+        call_result = firebase_entry.toDict()
+        debug_data.append(call_result)
+        generated_fields.append(call_result['field'])
+        debug_data_count = debug_data_count + 2
+        ##</end> set last updated flag last
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
@@ -431,30 +423,6 @@ class ReplicateToFirebase(object):
             return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
                     'firebase_fields': firebase_fields}
 
-        firebase_location = "skills_last_updated/"
-
-        #format for each entry is [folder_path,key,value]
-        simple_entries = [
-            [skill_uid, FF.keys.last_updated, unicode(int(time.time()))],
-        ]
-
-        ## process all the simple entries
-        for entry in simple_entries:
-            if entry[2] is None:
-                continue
-
-            firebase_entry = FF()
-            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                        FF.object_types.object,
-                                                        FF.functions.update,
-                                                        entry[2],
-                                                        entry[1])
-            debug_data.append(call_result)
-            call_result = firebase_entry.toDict()
-            debug_data.append(call_result)
-            generated_fields.append(call_result['field'])
-            debug_data_count = debug_data_count + 2
-        ##</end> process all the simple entries
 
         firebase_location = "skills_meta_data/{}".format(skill_uid)
         simple_entries = [
@@ -480,6 +448,21 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
+
+        ## set last updated flag last
+        firebase_entry = FF()
+        call_result = firebase_entry.setFieldValues("skills_last_updated/",
+                                                    FF.object_types.object,
+                                                    FF.functions.update,
+                                                    unicode(int(time.time())))
+        debug_data.append(call_result)
+        call_result = firebase_entry.setManualKey(skill_uid)
+        debug_data.append(call_result)
+        call_result = firebase_entry.toDict()
+        debug_data.append(call_result)
+        generated_fields.append(call_result['field'])
+        debug_data_count = debug_data_count + 2
+        ##</end> set last updated flag last
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
@@ -521,9 +504,9 @@ class ReplicateToFirebase(object):
 
         #format for each entry is [folder_path,key,value]
         simple_entries = [
-            ["", FF.keys.last_updated, unicode(int(time.time()))],
             ["", FF.keys.skill_uid, skill_uid],
             ["", FF.keys.need_uid, unicode(entity.need_uid)],
+            ["", FF.keys.last_updated, unicode(int(time.time()))],
         ]
 
         ## process all the simple entries
@@ -605,31 +588,6 @@ class ReplicateToFirebase(object):
             return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
                     'firebase_fields': firebase_fields}
 
-        firebase_location = "hashtags_last_updated/"
-
-        #format for each entry is [folder_path,key,value]
-        simple_entries = [
-            [hashtag_uid, FF.keys.last_updated, unicode(int(time.time()))],
-        ]
-
-        ## process all the simple entries
-        for entry in simple_entries:
-            if entry[2] is None:
-                continue
-
-            firebase_entry = FF()
-            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                        FF.object_types.object,
-                                                        FF.functions.update,
-                                                        entry[2],
-                                                        entry[1])
-            debug_data.append(call_result)
-            call_result = firebase_entry.toDict()
-            debug_data.append(call_result)
-            generated_fields.append(call_result['field'])
-            debug_data_count = debug_data_count + 2
-        ##</end> process all the simple entries
-
         firebase_location = "hashtags/{}".format(hashtag_uid)
         simple_entries = [
             ["", FF.keys.name, entity.name],
@@ -653,6 +611,21 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
+
+        ## set last updated flag last
+        firebase_entry = FF()
+        call_result = firebase_entry.setFieldValues("hashtags_last_updated/",
+                                                    FF.object_types.object,
+                                                    FF.functions.update,
+                                                    unicode(int(time.time())))
+        debug_data.append(call_result)
+        call_result = firebase_entry.setManualKey(hashtag_uid)
+        debug_data.append(call_result)
+        call_result = firebase_entry.toDict()
+        debug_data.append(call_result)
+        generated_fields.append(call_result['field'])
+        debug_data_count = debug_data_count + 2
+        ##</end> set last updated flag last
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
@@ -725,35 +698,11 @@ class ReplicateToFirebase(object):
             area_uids.append((user.country_uid, user.region_uid, user.area_uid))
         #</end> get user areas
 
+
+        ## set all last updated flags, this has to be done last
         firebase_location = "clusters_last_updated/"
 
-        #format for each entry is [folder_path,key,value]
-        now = datetime.datetime.utcnow()
-        last_updated = unicode(int(time.time()))
-        simple_entries = [
-            ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
-                area_uid[0], area_uid[1], area_uid[1], now.year, now.month, now.day, now.hour, cluster_uid
-            ), FF.keys.last_updated, last_updated]
-            for area_uid in area_uids
-        ]
 
-        ## process all the simple entries
-        for entry in simple_entries:
-            if entry[2] is None:
-                continue
-
-            firebase_entry = FF()
-            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                        FF.object_types.object,
-                                                        FF.functions.update,
-                                                        entry[2],
-                                                        entry[1])
-            debug_data.append(call_result)
-            call_result = firebase_entry.toDict()
-            debug_data.append(call_result)
-            generated_fields.append(call_result['field'])
-            debug_data_count = debug_data_count + 2
-        ##</end> process all the simple entries
 
         firebase_location = "clusters/{}/".format(cluster_uid)
         simple_entries = [
@@ -782,6 +731,38 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
+
+
+
+        ## set all last updated flags, this has to be done last
+
+        #format for each entry is [folder_path,key,value]
+        now = datetime.datetime.utcnow()
+        last_updated = unicode(int(time.time()))
+        simple_entries = [
+            ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
+                area_uid[0], area_uid[1], area_uid[1], now.year, now.month, now.day, now.hour, cluster_uid
+            ), FF.keys.last_updated, last_updated]
+            for area_uid in area_uids
+        ]
+
+
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> set all last updated flags, this has to be done last
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
