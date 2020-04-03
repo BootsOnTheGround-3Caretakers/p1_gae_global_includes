@@ -681,16 +681,16 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             [entity_id, FF.keys.last_updated, last_updated],
-            [entity_id, FF.keys.cluster_uid, entity_id_str],
+            [entity_id, FF.keys.cluster_uid, entity_id],
             [entity_id, FF.keys.needer_uid, entity.needer_uid],
-            [entity_id, FF.keys.expiration_date, entity.expiration_date],
-            ["{}/users".format(entity_id), FF.keys.last_updated, last_updated]
-            [user_cluster_member_dir, FF.keys.last_updated, last_updated]
-            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid]
-            [user_cluster_member_dir, FF.keys.user_first_name, user.first_name]
-            [user_cluster_member_dir, FF.keys.user_last_name, user.last_name]
-            [user_cluster_member_dir, FF.keys.phone_1, user.phone_1]
-            [user_cluster_member_dir, FF.keys.user_contact_email, user.email_address]
+            [entity_id, FF.keys.expiration_date, unicode(entity.expiration_date)],
+            ["{}/users".format(entity_id), FF.keys.last_updated, last_updated],
+            [user_cluster_member_dir, FF.keys.last_updated, last_updated],
+            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid],
+            [user_cluster_member_dir, FF.keys.user_first_name, user.first_name],
+            [user_cluster_member_dir, FF.keys.user_last_name, user.last_name],
+            [user_cluster_member_dir, FF.keys.phone_1, user.phone_1],
+            [user_cluster_member_dir, FF.keys.user_contact_email, user.email_address],
         ]
 
         ## process all the simple entries
@@ -829,13 +829,13 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             [entity_id, FF.keys.last_updated, last_updated],
-            ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated]
-            [user_cluster_member_dir, FF.keys.last_updated, last_updated]
-            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid]
-            [user_cluster_member_dir, FF.keys.user_first_name, joins_user.first_name]
-            [user_cluster_member_dir, FF.keys.user_last_name, joins_user.last_name]
-            [user_cluster_member_dir, FF.keys.phone_1, joins_user.phone_1]
-            [user_cluster_member_dir, FF.keys.user_contact_email, joins_user.email_address]
+            ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
+            [user_cluster_member_dir, FF.keys.last_updated, last_updated],
+            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid],
+            [user_cluster_member_dir, FF.keys.user_first_name, joins_user.first_name],
+            [user_cluster_member_dir, FF.keys.user_last_name, joins_user.last_name],
+            [user_cluster_member_dir, FF.keys.phone_1, joins_user.phone_1],
+            [user_cluster_member_dir, FF.keys.user_contact_email, joins_user.email_address],
         ]
 
         ## process all the simple entries
@@ -856,7 +856,7 @@ class ReplicateToFirebase(object):
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
 
-        firebase_location = "clusters/{}/".format(cluster_uid)
+        firebase_location = "clusters/{}/".format(entity.cluster_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles]
@@ -886,7 +886,9 @@ class ReplicateToFirebase(object):
         now = datetime.datetime.utcnow()
         simple_entries = [
             ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
-                joins_user.country_uid, joins_user.region_uid, joins_user.area_uid, now.year, now.month, now.day, now.hour, cluster_uid
+                joins_user.country_uid, joins_user.region_uid, joins_user.area_uid,
+                now.year, now.month, now.day, now.hour,
+                entity.cluster_uid
             ), FF.keys.last_updated, last_updated]
         ]
 
