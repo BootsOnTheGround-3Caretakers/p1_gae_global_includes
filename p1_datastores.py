@@ -81,6 +81,7 @@ class ReplicateToFirebase(object):
             "DsP1SkillsSatisfiesNeeds",
             "DsP1HashTags",
             "DsP1Cluster",
+            "DsP1UserClusterJoins",
             "DsP1CountryCodes",
             "DsP1RegionCodes",
             "DsP1AreaCodes",
@@ -97,6 +98,7 @@ class ReplicateToFirebase(object):
             self.__DsP1SkillsSatisfiesNeeds,
             self.__DsP1HashTags,
             self.__DsP1Cluster,
+            self.__DsP1UserClusterJoins,
             self.__DsP1CountryCodes,
             self.__DsP1RegionCodes,
             self.__DsP1AreaCodes,
@@ -660,62 +662,35 @@ class ReplicateToFirebase(object):
         entity = call_result['get_result']
         #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
 
-        try:
-            cluster_uid = unicode(entity_id)
-        except Exception as e:
-            return_msg += "failed to parse cluster_uid from entity id:%s with exception:%s" % (entity_id, e)
-            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
-                    'firebase_fields': firebase_fields}
+        user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
 
-        # get user cluster joins
-        joins_query = DsP1UserClusterJoins.query(ancestor=entity.key)
-        call_result = DSF.kfetch(joins_query)
-        if call_result['success'] != RC.success:
-            return_msg += "fetch of user cluster joins failed"
-            return {
-                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
-                'firebase_fields': firebase_fields
-            }
-        user_cluster_joins = call_result['fetch_result']
-        #</end> get user cluster joins
-
-        # get user_uid keys
-        user_keys = []
-        for user_cluster_join in user_cluster_joins:
-            user_keys.append(ndb.Key(DsP1Users._get_kind(), long(user_cluster_join.user_uid)))
-        #</end> get user_uid keys
-
-        # get user areas
-        call_result = DSF.kget_multi(user_keys)
+        call_result = DSF.kget(user_key)
         debug_data.append(call_result)
         if call_result['success'] != RC.success:
-            return_msg += "failed to get users of cluster {}".format(cluster_uid)
+            return_msg += "failed to get user of cluster {}".format(entity_id)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
                 'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
 
-        area_uids = []
-        users = call_result['get_result']
-        for user in users:
-            if not user:
-                continue
-
-            area_uids.append((user.country_uid, user.region_uid, user.area_uid))
-        #</end> get user areas
-
+        user = call_result['get_result']
 
         ## set all last updated flags, this has to be done last
-        firebase_location = "clusters_last_updated/"
+        last_updated = unicode(int(time.time()))
 
-
-
-        firebase_location = "clusters/{}/".format(cluster_uid)
+        firebase_location = "users/{}/clusters/".format(user.firebase_uid)
+        user_cluster_member_dir = "{}/users/{}".format(entity_id, entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            ["", FF.keys.cluster_uid, cluster_uid],
-            ["", FF.keys.location, "{}/{}/{}".format(area_uids[0][0], area_uids[0][1], area_uids[0][2])],
-        ] + [
-            ["users/{}".format(user_cluster_join.user_uid), FF.keys.roles, user_cluster_join.roles]
-            for user_cluster_join in user_cluster_joins
+            [entity_id, FF.keys.last_updated, last_updated],
+            [entity_id, FF.keys.cluster_uid, entity_id_str],
+            [entity_id, FF.keys.needer_uid, entity.needer_uid],
+            [entity_id, FF.keys.expiration_date, entity.expiration_date],
+            ["{}/users".format(entity_id), FF.keys.last_updated, last_updated]
+            [user_cluster_member_dir, FF.keys.last_updated, last_updated]
+            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid]
+            [user_cluster_member_dir, FF.keys.user_first_name, user.first_name]
+            [user_cluster_member_dir, FF.keys.user_last_name, user.last_name]
+            [user_cluster_member_dir, FF.keys.phone_1, user.phone_1]
+            [user_cluster_member_dir, FF.keys.user_contact_email, user.email_address]
         ]
 
         ## process all the simple entries
@@ -736,20 +711,184 @@ class ReplicateToFirebase(object):
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
 
+        firebase_location = "clusters/{}/".format(entity_id)
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.cluster_uid, unicode(entity_id)],
+            ["", FF.keys.location, "{}/{}/{}".format(user.country_uid, user.region_uid, user.area_uid)],
+        ]
 
+        ## process all the simple entries
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
 
-        ## set all last updated flags, this has to be done last
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> process all the simple entries
+
+        firebase_location = "clusters_last_updated/"
 
         #format for each entry is [folder_path,key,value]
         now = datetime.datetime.utcnow()
-        last_updated = unicode(int(time.time()))
         simple_entries = [
             ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
-                area_uid[0], area_uid[1], area_uid[1], now.year, now.month, now.day, now.hour, cluster_uid
+                user.country_uid, user.region_uid, user.area_uid, now.year, now.month, now.day, now.hour, entity_id
             ), FF.keys.last_updated, last_updated]
-            for area_uid in area_uids
         ]
 
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> set all last updated flags, this has to be done last
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] is not True:
+                return_msg += "setting clusters record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
+    def __DsP1UserClusterJoins(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1UserClusterJoins "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of Cluster record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+
+        cluster_key = ndb.Key(DsP1Cluster._get_kind(), long(entity.cluster_uid))
+        call_result = DSF.kget(cluster_key)
+        debug_data.append(call_result)
+        if call_result['success'] != RC.success:
+            return_msg += "failed to get cluster of cluster joins {}".format(entity_id)
+            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+
+        cluster = call_result['get_result']
+
+        cluster_user_key = ndb.Key(DsP1Users._get_kind(), long(cluster.user_uid))
+        call_result = DSF.kget(cluster_user_key)
+        debug_data.append(call_result)
+        if call_result['success'] != RC.success:
+            return_msg += "failed to get user of cluster {}".format(entity.cluster_uid)
+            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+
+        cluster_user = call_result['get_result']
+
+        joins_user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
+        call_result = DSF.kget(joins_user_key)
+        debug_data.append(call_result)
+        if call_result['success'] != RC.success:
+            return_msg += "failed to get user of cluster joins {}".format(entity_id)
+            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+
+        joins_user = call_result['get_result']
+
+        last_updated = unicode(int(time.time()))
+
+        firebase_location = "users/{}/clusters/".format(cluster_user.firebase_uid)
+        user_cluster_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            [entity_id, FF.keys.last_updated, last_updated],
+            ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated]
+            [user_cluster_member_dir, FF.keys.last_updated, last_updated]
+            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid]
+            [user_cluster_member_dir, FF.keys.user_first_name, joins_user.first_name]
+            [user_cluster_member_dir, FF.keys.user_last_name, joins_user.last_name]
+            [user_cluster_member_dir, FF.keys.phone_1, joins_user.phone_1]
+            [user_cluster_member_dir, FF.keys.user_contact_email, joins_user.email_address]
+        ]
+
+        ## process all the simple entries
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> process all the simple entries
+
+        firebase_location = "clusters/{}/".format(cluster_uid)
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles]
+        ]
+
+        ## process all the simple entries
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+        ##</end> process all the simple entries
+
+        firebase_location = "clusters_last_updated/"
+
+        #format for each entry is [folder_path,key,value]
+        now = datetime.datetime.utcnow()
+        simple_entries = [
+            ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
+                joins_user.country_uid, joins_user.region_uid, joins_user.area_uid, now.year, now.month, now.day, now.hour, cluster_uid
+            ), FF.keys.last_updated, last_updated]
+        ]
 
         for entry in simple_entries:
             if entry[2] is None:
@@ -1358,7 +1497,7 @@ class DsP1SkillJoinsUnusedCapacityNow(ndb.Model, DSF, ReplicateToFirebaseFlag, R
     unused_capacity_now = ndb.IntegerProperty(required=True)
     _unused_capacity_now = [True, "bigint", "greater0"]
 
-class DsP1Cluster(ndb.Model, DSF):
+class DsP1Cluster(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     needer_uid = ndb.StringProperty(required=True)
     _rule_needer_uid = [True, unicode, "AZaz09"]
     expiration_date = ndb.DateTimeProperty(required=False)
@@ -1370,7 +1509,7 @@ class DsP1ClusterPointer(ndb.Model, DSF):
     cluster_uid = ndb.IntegerProperty(required=True)
     _rule_cluster_uid = [True, "bigint", "greater0"]
 
-class DsP1UserClusterJoins(ndb.Model, DSF):
+class DsP1UserClusterJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.StringProperty(required=True) 
     _rule_user_uid = [True, unicode, "AZaz09"]
     cluster_uid = ndb.StringProperty(required=True)
@@ -1382,7 +1521,7 @@ class DsP1CountryCodes(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFireb
     name = ndb.StringProperty(required=True)
     _rule_name = [True, unicode, "len1"] # Country code rule?
 
-class DsP1RegionCodes(ndb.Model, DSF):
+class DsP1RegionCodes(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     region_code = ndb.StringProperty(required=True)
     _rule_region_code = [True, unicode, "len1"]
     name = ndb.StringProperty(required=True)
