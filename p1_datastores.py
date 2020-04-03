@@ -669,7 +669,7 @@ class ReplicateToFirebase(object):
         if call_result['success'] != RC.success:
             return_msg += "failed to get user of cluster {}".format(entity_id)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+                'firebase_fields': firebase_fields}
 
         user = call_result['get_result']
 
@@ -798,7 +798,7 @@ class ReplicateToFirebase(object):
         if call_result['success'] != RC.success:
             return_msg += "failed to get cluster of cluster joins {}".format(entity_id)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+                'firebase_fields': firebase_fields}
 
         cluster = call_result['get_result']
 
@@ -808,7 +808,7 @@ class ReplicateToFirebase(object):
         if call_result['success'] != RC.success:
             return_msg += "failed to get user of cluster {}".format(entity.cluster_uid)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+                    'firebase_fields': firebase_fields}
 
         cluster_user = call_result['get_result']
 
@@ -818,7 +818,7 @@ class ReplicateToFirebase(object):
         if call_result['success'] != RC.success:
             return_msg += "failed to get user of cluster joins {}".format(entity_id)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+                'firebase_fields': firebase_fields}
 
         joins_user = call_result['get_result']
 
@@ -1261,7 +1261,7 @@ class ReplicateToFirebase(object):
         if call_result['success'] != RC.success:
             return_msg += "failed to get users of skill {}".format(entity_id)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'org_uid_list':org_uid_list, 'org_name_list' : org_name_list}
+                'firebase_fields': firebase_fields}
         #</end> get users
 
         users = call_result['get_result']
