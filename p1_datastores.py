@@ -671,12 +671,14 @@ class ReplicateToFirebase(object):
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
                 'firebase_fields': firebase_fields}
 
-        user = call_result['get_result']
+        needer_user = call_result['get_result']
 
         ## set all last updated flags, this has to be done last
         last_updated = unicode(int(time.time()))
 
-        firebase_location = "users/{}/clusters/".format(user.firebase_uid)
+        #review! need to update cluster_uid,needer_uid, and expiration_date in the users/firebase_uid/clusters/cluster_uid folder for each
+        #user who is in the cluster and has a firebase uid
+        firebase_location = "users/{}/clusters/".format(needer_user.firebase_uid)
         user_cluster_member_dir = "{}/users/{}".format(entity_id, entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
@@ -687,10 +689,6 @@ class ReplicateToFirebase(object):
             ["{}/users".format(entity_id), FF.keys.last_updated, last_updated],
             [user_cluster_member_dir, FF.keys.last_updated, last_updated],
             [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid],
-            [user_cluster_member_dir, FF.keys.user_first_name, user.first_name],
-            [user_cluster_member_dir, FF.keys.user_last_name, user.last_name],
-            [user_cluster_member_dir, FF.keys.phone_1, user.phone_1],
-            [user_cluster_member_dir, FF.keys.user_contact_email, user.email_address],
         ]
 
         ## process all the simple entries
@@ -713,9 +711,11 @@ class ReplicateToFirebase(object):
 
         firebase_location = "clusters/{}/".format(entity_id)
         simple_entries = [
-            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.expiration_date, unicode(entity.expiration_date)],
             ["", FF.keys.cluster_uid, unicode(entity_id)],
-            ["", FF.keys.location, "{}/{}/{}".format(user.country_uid, user.region_uid, user.area_uid)],
+            ["", FF.keys.location, "{}/{}/{}".format(needer_user.country_uid, needer_user.region_uid, needer_user.area_uid)],
+            ["", FF.keys.last_updated, last_updated],
+
         ]
 
         ## process all the simple entries
@@ -742,7 +742,7 @@ class ReplicateToFirebase(object):
         now = datetime.datetime.utcnow()
         simple_entries = [
             ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
-                user.country_uid, user.region_uid, user.area_uid, now.year, now.month, now.day, now.hour, entity_id
+                needer_user.country_uid, needer_user.region_uid, needer_user.area_uid, now.year, now.month, now.day, now.hour, entity_id
             ), FF.keys.last_updated, last_updated]
         ]
 
@@ -824,6 +824,8 @@ class ReplicateToFirebase(object):
 
         last_updated = unicode(int(time.time()))
 
+        #review! need to get a child hierarchy get on the DsP1Clusters entity and  for each user_uid in the DsP1UserClusterJoins
+        # entries replicate the new clusters data to each user_uid/clusters/ firebase folder for each user that is in the cluster
         firebase_location = "users/{}/clusters/".format(cluster_user.firebase_uid)
         user_cluster_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
         simple_entries = [
