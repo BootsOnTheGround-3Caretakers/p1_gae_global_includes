@@ -83,9 +83,11 @@ class ReplicateToFirebase(object):
             "DsP1Cluster",
             "DsP1CountryCodes",
             "DsP1RegionCodes",
-            "DsP1AreaCode",
+            "DsP1AreaCodes",
             "DsP1CaretakerSkillsJoins",
             "DsP1SkillJoinsUnusedCapacityNow",
+            "DsP1Needer",
+            "DsP1NeederNeedsJoins",
         ]
 
         kind_functions = [
@@ -97,9 +99,11 @@ class ReplicateToFirebase(object):
             self.__DsP1Cluster,
             self.__DsP1CountryCodes,
             self.__DsP1RegionCodes,
-            self.__DsP1AreaCode,
+            self.__DsP1AreaCodes,
             self.__DsP1CaretakerSkillsJoins,
             self.__DsP1SkillJoinsUnusedCapacityNow,
+            self.__DsP1Needer,
+            self.__DsP1NeederNeedsJoins,
         ]
 
         ## process each entity and add it to the list to send to firebase
@@ -892,7 +896,7 @@ class ReplicateToFirebase(object):
         firebase_fields = generated_fields
         return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
 
-    def __DsP1AreaCode(self, entity_id, entity, delete_flag=False):
+    def __DsP1AreaCodes(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1RegionCodes "
         debug_data = []
         call_result = {}
@@ -1158,6 +1162,134 @@ class ReplicateToFirebase(object):
         firebase_fields = generated_fields
         return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
 
+    def __DsP1Needer(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1Needer "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of Needer record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+
+        user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
+        call_result = DSF.kget(user_key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of user record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        user = call_result['get_result']
+
+        firebase_location = "users/{}/needers/".format(user.firebase_uid)
+
+        last_updated = unicode(int(time.time()))
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
+            [entity_id, FF.keys.last_updated, last_updated],
+        ]
+
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] != RC.success:
+                return_msg += "setting needer record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
+    def __DsP1NeederNeedsJoins(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1NeederNeedsJoins "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of Needer record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+
+        user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
+        call_result = DSF.kget(user_key)
+        if call_result['success'] != RC.success:
+            return_msg += "get of user record failed"
+            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
+
+        user = call_result['get_result']
+
+        firebase_location = "users/{}/needers/".format(user.firebase_uid)
+
+        last_updated = unicode(int(time.time()))
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
+            [entity.needer_uid, FF.keys.last_updated, last_updated],
+            [entity.needer_uid, FF.keys.need_uid, entity.need_uid],
+            [entity.needer_uid, FF.keys.special_notes, entity.special_requests],
+        ]
+
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data['success'] != RC.success:
+                return_msg += "setting NeederNeedsJoins record or type record failed"
+                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
 
 class DsP1UserPointers(ndb.Model, DSF):
     user_uid = ndb.StringProperty(required=True)
@@ -1192,7 +1324,7 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     account_flags = ndb.StringProperty(required=False) # see UML for details
     _rule_account_flags = [False, unicode, "len1"]
     location_cords = ndb.GeoPtProperty(required=False) # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
-    _location_cords = [False, unicode, "len1"]
+    _rule_location_cords = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.StringProperty(required=True)
@@ -1259,7 +1391,7 @@ class DsP1RegionCodes(ndb.Model, DSF):
     _rule_description = [False, unicode, "len1"]
 
 
-class DsP1AreaCode(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
+class DsP1AreaCodes(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     area_code = ndb.StringProperty(required=True)
     _rule_area_code = [True, unicode, "len1"]
 
@@ -1271,7 +1403,7 @@ class DsP1RegionCodePointer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateTo
     region_uid = ndb.StringProperty(required=True)
     _rule_region_uid = [True, unicode, "len1"]
 
-class DsP1NeederNeedsJoins(ndb.Model, DSF):
+class DsP1NeederNeedsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     need_uid = ndb.StringProperty(required=True)
     _rule_need_uid = [True, unicode, "len1"]
     user_uid = ndb.StringProperty(required=True)
@@ -1287,7 +1419,7 @@ class DsP1Needs(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     requirements = ndb.TextProperty(required=False)
     _rule_requirements = [False, unicode, "len1"]
 
-class DsP1Needer(ndb.Model, DSF):
+class DsP1Needer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.StringProperty(required=True)
     _rule_user_uid = [True, unicode, "AZaz09"]
 
@@ -1322,7 +1454,7 @@ class Datastores():
     cluster_joins = DsP1UserClusterJoins
     country_codes = DsP1CountryCodes
     region_codes = DsP1RegionCodes
-    area_code = DsP1AreaCode
+    area_codes = DsP1AreaCodes
     area_code_pointer = DsP1AreaCodePointer
     region_code_pointer = DsP1RegionCodePointer
     needer_needs_joins = DsP1NeederNeedsJoins
@@ -1336,6 +1468,6 @@ class Datastores():
     datastore_list = [
         user_pointers, users, caretaker_skills_joins,caretaker_skills, caretaker_skill_pointer,
         skills_satisfies_needs, skill_joins_unused_capacity_now, cluster, cluster_pointer, cluster_joins,
-        country_codes, region_codes, area_code, area_code_pointer, region_code_pointer,
+        country_codes, region_codes, area_codes, area_code_pointer, region_code_pointer,
         needer_needs_joins, needs, needer, created_uids_log, hashtags, hashtag_pointer
     ]
