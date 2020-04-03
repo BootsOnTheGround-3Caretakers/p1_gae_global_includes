@@ -828,7 +828,7 @@ class ReplicateToFirebase(object):
         user_cluster_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            [entity_id, FF.keys.last_updated, last_updated],
+            [entity.cluster_uid, FF.keys.last_updated, last_updated],
             ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
             [user_cluster_member_dir, FF.keys.last_updated, last_updated],
             [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid],
