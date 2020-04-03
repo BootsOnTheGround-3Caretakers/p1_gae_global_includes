@@ -27,6 +27,13 @@ class TaskArguments(object):
     s1t4_phone_number = 'p1s1t4_phone_number'
     s1t4_email_address = 'p1s1t4_email_address'
     s1t4_firebase_uid = 'p1s1t4_firebase_uid'
+    s1t4_country_uid = 'p1s1t4_country_uid'
+    s1t4_region_uid = 'p1s1t4_region_uid'
+    s1t4_area_uid = 'p1s1t4_area_uid'
+    s1t4_description = 'p1s1t4_description'
+    s1t4_preferred_radius = 'p1s1t4_preferred_radius'
+    s1t4_account_flags = 'p1s1t4_account_flags'
+    s1t4_location_coords = 'p1s1t4_location_coords'
 
     s1t5_user_uid = 'p1s1t5_user_uid'
     s1t5_expiration_date = 'p1s1t5_expiration_date'
