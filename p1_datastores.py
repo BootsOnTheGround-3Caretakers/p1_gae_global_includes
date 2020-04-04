@@ -1483,13 +1483,13 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.StringProperty(required=True)
-    _rule_user_uid = [True, unicode, "len1"]
+    _rule_user_uid = [True, long, "bigint", "greater0"]
     skill_uid = ndb.StringProperty(required=True)
-    _rule_skill_uid = [True, unicode, "len1"]
+    _rule_skill_uid = [True, long, "bigint", "greater0"]
     special_notes = ndb.TextProperty(required=False)
     _rule_special_notes = [False, unicode, "len1"]
     total_capacity = ndb.IntegerProperty(required=True, default=1)
-    _rule_total_capacity = [True, "bigint", "greater0"]
+    _rule_total_capacity = [True,long, "bigint", "greater0"]
 
 class DsP1CaretakerSkills(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     skill_name = ndb.StringProperty(required=True)
