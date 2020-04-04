@@ -840,6 +840,19 @@ class ReplicateToFirebase(object):
 
         last_updated = unicode(int(time.time()))
 
+        current_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            [entity.cluster_uid, FF.keys.last_updated, last_updated],
+            ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
+            [current_member_dir, FF.keys.last_updated, last_updated],
+            [current_member_dir, FF.keys.user_uid, entity.user_uid],
+            [current_member_dir, FF.keys.user_first_name, current_joins_user.first_name],
+            [current_member_dir, FF.keys.user_last_name, current_joins_user.last_name],
+            [current_member_dir, FF.keys.phone_1, current_joins_user.phone_1],
+            [current_member_dir, FF.keys.user_contact_email, current_joins_user.email_address],
+        ]
+
         #review! need to get a child hierarchy get on the DsP1Clusters entity and  for each user_uid in the DsP1UserClusterJoins
         # entries replicate the new clusters data to each user_uid/clusters/ firebase folder for each user that is in the cluster
         for cluster_member in cluster_members:
@@ -847,18 +860,6 @@ class ReplicateToFirebase(object):
                 continue
 
             firebase_location = "users/{}/clusters/".format(cluster_member.firebase_uid)
-            current_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
-            simple_entries = [
-                ["", FF.keys.last_updated, last_updated],
-                [entity.cluster_uid, FF.keys.last_updated, last_updated],
-                ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
-                [current_member_dir, FF.keys.last_updated, last_updated],
-                [current_member_dir, FF.keys.user_uid, entity.user_uid],
-                [current_member_dir, FF.keys.user_first_name, current_joins_user.first_name],
-                [current_member_dir, FF.keys.user_last_name, current_joins_user.last_name],
-                [current_member_dir, FF.keys.phone_1, current_joins_user.phone_1],
-                [current_member_dir, FF.keys.user_contact_email, current_joins_user.email_address],
-            ]
 
             ## process all the simple entries
             for entry in simple_entries:
