@@ -1482,9 +1482,9 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     _rule_location_cords = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    user_uid = ndb.StringProperty(required=True)
+    user_uid = ndb.IntegerProperty(required=True)
     _rule_user_uid = [True, long, "bigint", "greater0"]
-    skill_uid = ndb.StringProperty(required=True)
+    skill_uid = ndb.IntegerProperty(required=True)
     _rule_skill_uid = [True, long, "bigint", "greater0"]
     special_notes = ndb.TextProperty(required=False)
     _rule_special_notes = [False, unicode, "len1"]
