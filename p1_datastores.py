@@ -796,11 +796,24 @@ class ReplicateToFirebase(object):
         call_result = DSF.kget(cluster_key)
         debug_data.append(call_result)
         if call_result['success'] != RC.success:
-            return_msg += "failed to get cluster of cluster joins {}".format(entity_id)
+            return_msg += "failed to get cluster entity {}".format(entity_id)
             return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
                 'firebase_fields': firebase_fields}
 
         cluster = call_result['get_result']
+
+        ## get all clusterJoins under the cluster
+        cluster_joins_query = DsP1Cluster.query(ancestor=cluster_key)
+        call_result = DSF.kfetch(cluster_joins_query)
+        if call_result['success'] != RC.success:
+            return_msg += "failed to get cluster of cluster joins {}".format(entity_id)
+            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+                'firebase_fields': firebase_fields}
+
+        cluster_joins = call_result['get_results']
+
+        ## </end> get all clusterJoin under the cluster
+
 
         cluster_user_key = ndb.Key(DsP1Users._get_kind(), long(cluster.user_uid))
         call_result = DSF.kget(cluster_user_key)
