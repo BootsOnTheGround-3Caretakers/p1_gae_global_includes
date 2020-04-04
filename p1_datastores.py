@@ -1208,6 +1208,33 @@ class ReplicateToFirebase(object):
 
         user = call_result['get_result']
 
+        if user.firebase_uid:
+            firebase_location = "users/{}/skills/".format(user.firebase_uid)
+            last_updated = unicode(int(time.time()))
+            simple_entries = [
+                ["", FF.keys.last_updated, last_updated],
+                ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
+                [entity_id, FF.keys.last_updated, last_updated],
+                [entity_id, FF.keys.skill_uid, unicode(entity.skill_uid)],
+                [entity_id, FF.keys.special_notes, entity.special_notes],
+            ]
+
+            for entry in simple_entries:
+                if entry[2] is None:
+                    continue
+
+                firebase_entry = FF()
+                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                            FF.object_types.object,
+                                                            FF.functions.update,
+                                                            entry[2],
+                                                            entry[1])
+                debug_data.append(call_result)
+                call_result = firebase_entry.toDict()
+                debug_data.append(call_result)
+                generated_fields.append(call_result['field'])
+                debug_data_count = debug_data_count + 2
+
         firebase_location = "available_skills_search_data/{}/{}/{}/".format(
             user.country_uid, user.region_uid, user.area_uid
         )
@@ -1354,6 +1381,9 @@ class ReplicateToFirebase(object):
 
         user = call_result['get_result']
 
+        if not user.firebase_uid:
+            return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+
         firebase_location = "users/{}/needers/".format(user.firebase_uid)
 
         last_updated = unicode(int(time.time()))
@@ -1361,6 +1391,7 @@ class ReplicateToFirebase(object):
             ["", FF.keys.last_updated, last_updated],
             ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
             [entity_id, FF.keys.last_updated, last_updated],
+            # The remaining entries will be filled when __DsP1NeederNeedsJoins executed on p1s2t4
         ]
 
         for entry in simple_entries:
@@ -1416,6 +1447,8 @@ class ReplicateToFirebase(object):
                     'firebase_fields': firebase_fields}
 
         user = call_result['get_result']
+        if not user.firebase_uid:
+            return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
 
         firebase_location = "users/{}/needers/".format(user.firebase_uid)
 
