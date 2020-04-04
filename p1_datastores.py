@@ -676,14 +676,7 @@ class ReplicateToFirebase(object):
         ## set all last updated flags, this has to be done last
         last_updated = unicode(int(time.time()))
 
-        #review! need to update cluster_uid,needer_uid, and expiration_date in the users/firebase_uid/clusters/cluster_uid folder for each
-        #user who is in the cluster and has a firebase uid
-        # Replication of ClusterJoins members is done in another method below: __DsP1UserClusterJoins.
-        # Because when the cluster is new, we don't have any ClusterJoins object created yet, so we can't do the required "for each user" here.
-        # However, at this point we already know that at least it will have one member: the needer itself,
-        # so we add the needer here.
         firebase_location = "users/{}/clusters/".format(needer_user.firebase_uid)
-        user_cluster_member_dir = "{}/users/{}".format(entity_id, entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             [entity_id, FF.keys.last_updated, last_updated],
@@ -691,12 +684,6 @@ class ReplicateToFirebase(object):
             [entity_id, FF.keys.needer_uid, entity.needer_uid],
             [entity_id, FF.keys.expiration_date, unicode(entity.expiration_date)],
             ["{}/users".format(entity_id), FF.keys.last_updated, last_updated],
-            [user_cluster_member_dir, FF.keys.last_updated, last_updated],
-            [user_cluster_member_dir, FF.keys.user_uid, entity.user_uid],
-            [user_cluster_member_dir, FF.keys.user_first_name, needer_user.first_name],
-            [user_cluster_member_dir, FF.keys.user_last_name, needer_user.last_name],
-            [user_cluster_member_dir, FF.keys.phone_1, needer_user.phone_1],
-            [user_cluster_member_dir, FF.keys.user_contact_email, needer_user.email_address],
         ]
 
         ## process all the simple entries
@@ -812,21 +799,28 @@ class ReplicateToFirebase(object):
         current_joins_user = call_result['get_result']
         #</end> get current joins user whose info will be propagated to other all other cluster members
 
-        # Get all cluster joins member
-        cluster_key = ndb.Key(DsP1Cluster._get_kind(), long(entity.cluster_uid))
-        joins_query = DsP1UserClusterJoins.query(ancestor=cluster_key)
-        call_result = DSF.kfetch(joins_query)
-        if call_result['success'] != RC.success:
-            return_msg += "fetch of user cluster joins failed"
+        ## Get all cluster joins members
+        try:
+            cluster_key = ndb.Key(DsP1Cluster._get_kind(), long(entity.cluster_uid))
+            joins_query = DsP1UserClusterJoins.query(ancestor=cluster_key)
+            cluster_joins = joins_query.fetch(deadline=60)
+        except Exception as error:
+            return_msg += EF.parseException("fetching user cluster joins",error)
             return {
-                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
+                'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
                 'firebase_fields': firebase_fields
             }
-        cluster_joins = call_result['fetch_result']
 
         cluster_member_keys = []
+        entity_user_in_fetch_results = False
         for cluster_join in cluster_joins:
+            if cluster_join.user_uid == entity.user_uid:
+                entity_user_in_fetch_results = True
             cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(cluster_join.user_uid)))
+
+        #when adding a new user to cluster, they won't show up in the results yet
+        if entity_user_in_fetch_results is False:
+            cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(entity.user_uid)))
 
         call_result = DSF.kget_multi(cluster_member_keys)
         debug_data.append(call_result)
@@ -836,29 +830,37 @@ class ReplicateToFirebase(object):
                 'firebase_fields': firebase_fields}
 
         cluster_members = call_result['get_result']
-        #</end> Get all cluster joins member
+        ##</end> Get all cluster joins member
 
         last_updated = unicode(int(time.time()))
 
-        current_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
+
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             [entity.cluster_uid, FF.keys.last_updated, last_updated],
             ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
+        ]
+        for entry in cluster_members:
+            user_uid = entry.key.integer_id()
+            current_member_dir = "{}/users/{}".format(entity.cluster_uid, user_uid)
+            simple_entries += [
+            [current_member_dir, FF.keys.user_uid, unicode(user_uid)],
+            [current_member_dir, FF.keys.user_first_name, entry.first_name],
+            [current_member_dir, FF.keys.user_last_name, entry.last_name],
+            [current_member_dir, FF.keys.phone_1, entry.phone_1],
+            [current_member_dir, FF.keys.user_contact_email, entry.email_address],
+            [current_member_dir, FF.keys.user_contact_email, entry.roles],
             [current_member_dir, FF.keys.last_updated, last_updated],
-            [current_member_dir, FF.keys.user_uid, entity.user_uid],
-            [current_member_dir, FF.keys.user_first_name, current_joins_user.first_name],
-            [current_member_dir, FF.keys.user_last_name, current_joins_user.last_name],
-            [current_member_dir, FF.keys.phone_1, current_joins_user.phone_1],
-            [current_member_dir, FF.keys.user_contact_email, current_joins_user.email_address],
         ]
 
         #review! need to get a child hierarchy get on the DsP1Clusters entity and  for each user_uid in the DsP1UserClusterJoins
         # entries replicate the new clusters data to each user_uid/clusters/ firebase folder for each user that is in the cluster
+        logging.debug(cluster_members)
         for cluster_member in cluster_members:
             if not cluster_member.firebase_uid:
                 continue
 
+            logging.debug(cluster_member.firebase_uid)
             firebase_location = "users/{}/clusters/".format(cluster_member.firebase_uid)
 
             ## process all the simple entries
