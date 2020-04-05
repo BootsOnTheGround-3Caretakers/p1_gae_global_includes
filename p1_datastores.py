@@ -676,38 +676,11 @@ class ReplicateToFirebase(object):
         ## set all last updated flags, this has to be done last
         last_updated = unicode(int(time.time()))
 
-        firebase_location = "users/{}/clusters/".format(needer_user.firebase_uid)
-        simple_entries = [
-            ["", FF.keys.last_updated, last_updated],
-            [entity_id, FF.keys.last_updated, last_updated],
-            [entity_id, FF.keys.cluster_uid, entity_id],
-            [entity_id, FF.keys.needer_uid, entity.needer_uid],
-            [entity_id, FF.keys.expiration_date, unicode(entity.expiration_date)],
-            ["{}/users".format(entity_id), FF.keys.last_updated, last_updated],
-        ]
-
-        ## process all the simple entries
-        for entry in simple_entries:
-            if entry[2] is None:
-                continue
-
-            firebase_entry = FF()
-            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                        FF.object_types.object,
-                                                        FF.functions.update,
-                                                        entry[2],
-                                                        entry[1])
-            debug_data.append(call_result)
-            call_result = firebase_entry.toDict()
-            debug_data.append(call_result)
-            generated_fields.append(call_result['field'])
-            debug_data_count = debug_data_count + 2
-        ##</end> process all the simple entries
-
         firebase_location = "clusters/{}/".format(entity_id)
         simple_entries = [
             ["", FF.keys.expiration_date, unicode(entity.expiration_date)],
             ["", FF.keys.cluster_uid, unicode(entity_id)],
+            ["", FF.keys.needer_uid, unicode(entity.needer_uid)],
             ["", FF.keys.location, "{}/{}/{}".format(needer_user.country_uid, needer_user.region_uid, needer_user.area_uid)],
             ["", FF.keys.last_updated, last_updated],
 
@@ -813,13 +786,16 @@ class ReplicateToFirebase(object):
 
         cluster_member_keys = []
         entity_user_in_fetch_results = False
+        cluster_member_roles = {}
         for cluster_join in cluster_joins:
+            cluster_member_roles[unicode(cluster_join.user_uid)] = cluster_join.roles
             if cluster_join.user_uid == entity.user_uid:
                 entity_user_in_fetch_results = True
             cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(cluster_join.user_uid)))
 
         #when adding a new user to cluster, they won't show up in the results yet
         if entity_user_in_fetch_results is False:
+            cluster_member_roles[unicode(entity.user_uid)] = entity.roles
             cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(entity.user_uid)))
 
         call_result = DSF.kget_multi(cluster_member_keys)
@@ -840,27 +816,29 @@ class ReplicateToFirebase(object):
             [entity.cluster_uid, FF.keys.last_updated, last_updated],
             ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
         ]
+
         for entry in cluster_members:
             user_uid = entry.key.integer_id()
             current_member_dir = "{}/users/{}".format(entity.cluster_uid, user_uid)
+
+            user_uid_str = unicode(user_uid)
+            if user_uid_str in cluster_member_roles:
+                simple_entries.append([current_member_dir, FF.keys.roles, cluster_member_roles[user_uid_str]])
+
             simple_entries += [
             [current_member_dir, FF.keys.user_uid, unicode(user_uid)],
             [current_member_dir, FF.keys.user_first_name, entry.first_name],
             [current_member_dir, FF.keys.user_last_name, entry.last_name],
             [current_member_dir, FF.keys.phone_1, entry.phone_1],
             [current_member_dir, FF.keys.user_contact_email, entry.email_address],
-            [current_member_dir, FF.keys.user_contact_email, entry.roles],
             [current_member_dir, FF.keys.last_updated, last_updated],
         ]
 
-        #review! need to get a child hierarchy get on the DsP1Clusters entity and  for each user_uid in the DsP1UserClusterJoins
-        # entries replicate the new clusters data to each user_uid/clusters/ firebase folder for each user that is in the cluster
-        logging.debug(cluster_members)
+
         for cluster_member in cluster_members:
             if not cluster_member.firebase_uid:
                 continue
 
-            logging.debug(cluster_member.firebase_uid)
             firebase_location = "users/{}/clusters/".format(cluster_member.firebase_uid)
 
             ## process all the simple entries
@@ -1457,7 +1435,6 @@ class ReplicateToFirebase(object):
         last_updated = unicode(int(time.time()))
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
             [entity.needer_uid, FF.keys.last_updated, last_updated],
             [entity.needer_uid, FF.keys.need_uid, entity.need_uid],
             [entity.needer_uid, FF.keys.special_notes, entity.special_requests],
