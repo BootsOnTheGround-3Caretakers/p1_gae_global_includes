@@ -383,7 +383,7 @@ class ReplicateToFirebase(object):
         call_result = firebase_entry.setFieldValues("needs_last_updated/",
                                                     FF.object_types.object,
                                                     FF.functions.update,
-                                                    unicode(int(time.time())))
+                                                    "deleted" if delete_flag else unicode(int(time.time())))
         debug_data.append(call_result)
         call_result = firebase_entry.setManualKey(needs_uid)
         debug_data.append(call_result)
@@ -460,7 +460,7 @@ class ReplicateToFirebase(object):
         call_result = firebase_entry.setFieldValues("skills_last_updated/",
                                                     FF.object_types.object,
                                                     FF.functions.update,
-                                                    unicode(int(time.time())))
+                                                    "deleted" if delete_flag else unicode(int(time.time())))
         debug_data.append(call_result)
         call_result = firebase_entry.setManualKey(skill_uid)
         debug_data.append(call_result)
@@ -512,7 +512,7 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["", FF.keys.skill_uid, skill_uid],
             ["", FF.keys.need_uid, unicode(entity.need_uid)],
-            ["", FF.keys.last_updated, unicode(int(time.time()))],
+            ["", FF.keys.last_updated, "deleted" if delete_flag else unicode(int(time.time()))],
         ]
 
         ## process all the simple entries
@@ -537,7 +537,7 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["", FF.keys.last_updated, unicode(int(time.time()))],
             ["", FF.keys.skill_uid, skill_uid],
-            ["", FF.keys.need_uid, unicode(entity.need_uid)],
+            ["", FF.keys.need_uid, "deleted" if delete_flag else unicode(entity.need_uid)],
         ]
 
         ## process all the simple entries
@@ -623,7 +623,7 @@ class ReplicateToFirebase(object):
         call_result = firebase_entry.setFieldValues("hashtags_last_updated/",
                                                     FF.object_types.object,
                                                     FF.functions.update,
-                                                    unicode(int(time.time())))
+                                                    "deleted" if delete_flag else unicode(int(time.time())))
         debug_data.append(call_result)
         call_result = firebase_entry.setManualKey(hashtag_uid)
         debug_data.append(call_result)
@@ -682,7 +682,7 @@ class ReplicateToFirebase(object):
             ["", FF.keys.cluster_uid, unicode(entity_id)],
             ["", FF.keys.needer_uid, unicode(entity.needer_uid)],
             ["", FF.keys.location, "{}/{}/{}".format(needer_user.country_uid, needer_user.region_uid, needer_user.area_uid)],
-            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
 
         ]
 
@@ -711,7 +711,7 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
                 needer_user.country_uid, needer_user.region_uid, needer_user.area_uid, now.year, now.month, now.day, now.hour, entity_id
-            ), FF.keys.last_updated, last_updated]
+            ), FF.keys.last_updated, "deleted" if delete_flag else last_updated]
         ]
 
         for entry in simple_entries:
@@ -934,7 +934,7 @@ class ReplicateToFirebase(object):
         #format for each entry is [folder_path,key,value]
         last_updated = unicode(int(time.time()))
         simple_entries = [
-            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
             ["", FF.keys.index_1, unicode(entity_id)],
             ["", FF.keys.index_2, entity.name],
         ]
@@ -994,7 +994,7 @@ class ReplicateToFirebase(object):
         #format for each entry is [folder_path,key,value]
         last_updated = unicode(int(time.time()))
         simple_entries = [
-            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
             ["", FF.keys.index_1, entity.region_code],
             ["", FF.keys.index_2, entity.name],
             ["", FF.keys.index_3, entity.description],
@@ -1057,7 +1057,7 @@ class ReplicateToFirebase(object):
         #format for each entry is [folder_path,key,value]
         last_updated = unicode(int(time.time()))
         simple_entries = [
-            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
             ["", FF.keys.index_1, entity.area_code],
         ]
 
@@ -1175,14 +1175,14 @@ class ReplicateToFirebase(object):
                     'firebase_fields': firebase_fields}
 
         user = call_result['get_result']
+        last_updated = unicode(int(time.time()))
 
         if user.firebase_uid:
             firebase_location = "users/{}/skills/".format(user.firebase_uid)
-            last_updated = unicode(int(time.time()))
             simple_entries = [
                 ["", FF.keys.last_updated, last_updated],
                 ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
-                [entity_id, FF.keys.last_updated, last_updated],
+                [entity_id, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
                 [entity_id, FF.keys.skill_uid, unicode(entity.skill_uid)],
                 [entity_id, FF.keys.special_notes, entity.special_notes],
             ]
@@ -1209,7 +1209,8 @@ class ReplicateToFirebase(object):
 
         simple_entries = [
             [entity_id, FF.keys.skill_join_uid, entity_id],
-            [entity_id, FF.keys.total_capacity, entity.total_capacity],
+            [entity_id, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
+            [entity_id, FF.keys.total_capacity, unicode(entity.total_capacity)],
         ]
 
         for entry in simple_entries:
@@ -1358,7 +1359,7 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
-            [entity_id, FF.keys.last_updated, last_updated],
+            [entity_id, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
             # The remaining entries will be filled when __DsP1NeederNeedsJoins executed on p1s2t4
         ]
 
@@ -1424,7 +1425,7 @@ class ReplicateToFirebase(object):
         needer_uid_str = unicode(entity.needer_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            [needer_uid_str, FF.keys.last_updated, last_updated],
+            [needer_uid_str, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
             [needer_uid_str, FF.keys.need_uid, unicode(entity.need_uid)],
             [needer_uid_str, FF.keys.special_notes, entity.special_requests],
         ]
