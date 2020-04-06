@@ -54,6 +54,7 @@ class TaskArguments(object):
     s2t3_user_uid = 'p1s2t3_user_uid'
     s2t3_skill_uid = 'p1s2t3_skill_uid'
     s2t3_special_notes = 'p1s2t3_special_notes'
+    s2t3_total_capacity = 'p1s2t3_total_capacity'
 
     s2t4_user_uid = 'p1s2t4_user_uid'
     s2t4_needer_uid = 'p1s2t4_needer_uid'
