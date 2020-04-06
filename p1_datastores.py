@@ -809,7 +809,7 @@ class ReplicateToFirebase(object):
         current_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            [entity.cluster_uid, FF.keys.last_updated, last_updated],
+            [unicode(entity.cluster_uid), FF.keys.last_updated, last_updated],
             ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
             [current_member_dir, FF.keys.user_uid, unicode(entity.user_uid)],
             [current_member_dir, FF.keys.user_first_name, current_joins_user.first_name],
@@ -1113,13 +1113,13 @@ class ReplicateToFirebase(object):
 
             if len(cluster_joins) == 1:
                 simple_entries = [
-                    ["", FF.keys.cluster_uid, cluster_joins[0].cluster_uid],
+                    ["", FF.keys.cluster_uid, unicode(cluster_joins[0].cluster_uid)],
                 ]
             else:
                 simple_entries = []
                 for i, cluster_join in enumerate(cluster_joins):
                     simple_entries.append(
-                        [unicode(i + 1), FF.keys.cluster_uid, cluster_join.cluster_uid]
+                        [unicode(i + 1), FF.keys.cluster_uid, unicode(cluster_join.cluster_uid)]
                     )
 
             for entry in simple_entries:
@@ -1422,11 +1422,12 @@ class ReplicateToFirebase(object):
         firebase_location = "users/{}/needers/".format(user.firebase_uid)
 
         last_updated = unicode(int(time.time()))
+        needer_uid_str = unicode(entity.needer_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            [entity.needer_uid, FF.keys.last_updated, last_updated],
-            [entity.needer_uid, FF.keys.need_uid, entity.need_uid],
-            [entity.needer_uid, FF.keys.special_notes, entity.special_requests],
+            [needer_uid_str, FF.keys.last_updated, last_updated],
+            [needer_uid_str, FF.keys.need_uid, unicode(entity.need_uid)],
+            [needer_uid_str, FF.keys.special_notes, entity.special_requests],
         ]
 
         for entry in simple_entries:
