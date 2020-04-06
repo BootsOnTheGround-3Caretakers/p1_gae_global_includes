@@ -1457,8 +1457,8 @@ class ReplicateToFirebase(object):
 
 
 class DsP1UserPointers(ndb.Model, DSF):
-    user_uid = ndb.StringProperty(required=True)
-    _rule_user_uid = [True, unicode, "AZaz09"]
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, long, "bigint", "greater0"]
 
 
 class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
@@ -1510,36 +1510,36 @@ class DsP1CaretakerSkills(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFi
     _rule_skill_type = [True, unicode, "len1"]
 
 class DsP1CaretakerSkillPointer(ndb.Model, DSF):
-    skill_uid = ndb.StringProperty(required=True)
-    _rule_skill_uid = [True, unicode, "len1"]
+    skill_uid = ndb.IntegerProperty(required=True)
+    _rule_skill_uid = [True, long, "bigint", "greater0"]
 
 class DsP1SkillsSatisfiesNeeds(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    need_uid = ndb.StringProperty(required=True)
-    _rule_need_uid = [True, unicode, "len1"]
+    need_uid = ndb.IntegerProperty(required=True)
+    _rule_need_uid = [True, long, "bigint", "greater0"]
 
 class DsP1SkillJoinsUnusedCapacityNow(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    skill_uid = ndb.StringProperty(required=True)
-    _rule_skill_uid = [True, unicode, "len1"]
+    skill_uid = ndb.IntegerProperty(required=True)
+    _rule_skill_uid = [True, long, "bigint", "greater0"]
     unused_capacity_now = ndb.IntegerProperty(required=True)
     _unused_capacity_now = [True, "bigint", "greater0"]
 
 class DsP1Cluster(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    needer_uid = ndb.StringProperty(required=True)
-    _rule_needer_uid = [True, unicode, "AZaz09"]
+    needer_uid = ndb.IntegerProperty(required=True)
+    _rule_needer_uid = [True, long, "bigint", "greater0"]
     expiration_date = ndb.DateTimeProperty(required=False)
     _rule_expiration_date = [True, datetime.datetime]
-    user_uid = ndb.StringProperty(required=True)
-    _rule_user_uid = [False, unicode, "AZaz09"]
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, long, "bigint", "greater0"]
 
 class DsP1ClusterPointer(ndb.Model, DSF):
     cluster_uid = ndb.IntegerProperty(required=True)
     _rule_cluster_uid = [True, "bigint", "greater0"]
 
 class DsP1UserClusterJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    user_uid = ndb.StringProperty(required=True) 
-    _rule_user_uid = [True, unicode, "AZaz09"]
-    cluster_uid = ndb.StringProperty(required=True)
-    _rule_cluster_uid = [True, unicode, "AZaz09"]
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, long, "bigint", "greater0"]
+    cluster_uid = ndb.IntegerProperty(required=True)
+    _rule_cluster_uid = [True, "bigint", "greater0"]
     roles = ndb.StringProperty(required=True)
     _rule_roles = [True, unicode, "len1"] # custom rule? a/b/c/d
 
@@ -1569,12 +1569,12 @@ class DsP1RegionCodePointer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateTo
     _rule_region_uid = [True, unicode, "len1"]
 
 class DsP1NeederNeedsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    need_uid = ndb.StringProperty(required=True)
-    _rule_need_uid = [True, unicode, "len1"]
-    user_uid = ndb.StringProperty(required=True)
-    _rule_user_uid = [True, unicode, "AZaz09"]
-    needer_uid = ndb.StringProperty(required=True)
-    _rule_needer_uid = [True, unicode, "len1"] # AZaz09?
+    need_uid = ndb.IntegerProperty(required=True)
+    _rule_need_uid = [True, long, "bigint", "greater0"]
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, long, "bigint", "greater0"]
+    needer_uid = ndb.IntegerProperty(required=True)
+    _rule_needer_uid = [True, long, "bigint", "greater0"]
     special_requests = ndb.TextProperty(required=False)
     _rule_special_requests = [False, unicode, "len1"]
 
@@ -1585,8 +1585,8 @@ class DsP1Needs(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     _rule_requirements = [False, unicode, "len1"]
 
 class DsP1Needer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
-    user_uid = ndb.StringProperty(required=True)
-    _rule_user_uid = [True, unicode, "AZaz09"]
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, long, "bigint", "greater0"]
 
 class DsP1CreatedUidsLog(ndb.Model, DSF):
     model_name = ndb.BooleanProperty(required=True)
@@ -1604,7 +1604,7 @@ class DsP1HashTags(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase)
 
 class DsP1HashTagPointer(ndb.Model, DSF):
     hashtag_uid = ndb.IntegerProperty(required=True)
-    _rule_hashtag_uid = [False, "bigint", "greater0"]
+    _rule_hashtag_uid = [True, long, "bigint", "greater0"]
 
 class Datastores():
     user_pointers = DsP1UserPointers
