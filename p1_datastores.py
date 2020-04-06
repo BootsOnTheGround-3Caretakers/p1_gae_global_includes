@@ -817,8 +817,7 @@ class ReplicateToFirebase(object):
             [current_member_dir, FF.keys.phone_1, current_joins_user.phone_1],
             [current_member_dir, FF.keys.user_contact_email, current_joins_user.email_address],
             [current_member_dir, FF.keys.roles, entity.roles],
-            [current_member_dir, FF.keys.last_updated, last_updated],
-            [current_member_dir, FF.keys.delete, FF.keys.delete if delete_flag else ""],
+            [current_member_dir, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
         ]
         #</end> Prepare the changes of the current joins entity to be propagated to all other cluster members
 
@@ -851,7 +850,7 @@ class ReplicateToFirebase(object):
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles],
-            ["users/{}".format(entity.user_uid), FF.keys.delete, FF.keys.delete if delete_flag else ""],
+            ["users/{}".format(entity.user_uid), FF.keys.last_updated, "deleted" if delete_flag else last_updated],
         ]
 
         ## process all the simple entries
