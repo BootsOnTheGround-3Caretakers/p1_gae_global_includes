@@ -793,11 +793,6 @@ class ReplicateToFirebase(object):
                 entity_user_in_fetch_results = True
             cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(cluster_join.user_uid)))
 
-        #when adding a new user to cluster, they won't show up in the results yet
-        if entity_user_in_fetch_results is False:
-            cluster_member_roles[unicode(entity.user_uid)] = entity.roles
-            cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(entity.user_uid)))
-
         call_result = DSF.kget_multi(cluster_member_keys)
         debug_data.append(call_result)
         if call_result['success'] != RC.success:
@@ -810,31 +805,24 @@ class ReplicateToFirebase(object):
 
         last_updated = unicode(int(time.time()))
 
-
+        # Prepare the changes of the current joins entity to be propagated to all other cluster members
+        current_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             [entity.cluster_uid, FF.keys.last_updated, last_updated],
             ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
-        ]
-
-        for entry in cluster_members:
-            user_uid = entry.key.integer_id()
-            current_member_dir = "{}/users/{}".format(entity.cluster_uid, user_uid)
-
-            user_uid_str = unicode(user_uid)
-            if user_uid_str in cluster_member_roles:
-                simple_entries.append([current_member_dir, FF.keys.roles, cluster_member_roles[user_uid_str]])
-
-            simple_entries += [
-            [current_member_dir, FF.keys.user_uid, unicode(user_uid)],
-            [current_member_dir, FF.keys.user_first_name, entry.first_name],
-            [current_member_dir, FF.keys.user_last_name, entry.last_name],
-            [current_member_dir, FF.keys.phone_1, entry.phone_1],
-            [current_member_dir, FF.keys.user_contact_email, entry.email_address],
+            [current_member_dir, FF.keys.user_uid, unicode(entity.user_uid)],
+            [current_member_dir, FF.keys.user_first_name, current_joins_user.first_name],
+            [current_member_dir, FF.keys.user_last_name, current_joins_user.last_name],
+            [current_member_dir, FF.keys.phone_1, current_joins_user.phone_1],
+            [current_member_dir, FF.keys.user_contact_email, current_joins_user.email_address],
+            [current_member_dir, FF.keys.roles, entity.roles],
             [current_member_dir, FF.keys.last_updated, last_updated],
+            [current_member_dir, FF.keys.delete, FF.keys.delete if delete_flag else ""],
         ]
+        #</end> Prepare the changes of the current joins entity to be propagated to all other cluster members
 
-
+        # IN THIS LOOP we actually propagating the current joins to all other cluster members
         for cluster_member in cluster_members:
             if not cluster_member.firebase_uid:
                 continue
@@ -857,12 +845,13 @@ class ReplicateToFirebase(object):
                 debug_data.append(call_result)
                 generated_fields.append(call_result['field'])
                 debug_data_count = debug_data_count + 2
-            ##</end> process all the simple entries
+        #</end> IN THIS LOOP we actually propagating the current joins to all other cluster members
 
         firebase_location = "clusters/{}/".format(entity.cluster_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles]
+            ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles],
+            ["users/{}".format(entity.user_uid), FF.keys.delete, FF.keys.delete if delete_flag else ""],
         ]
 
         ## process all the simple entries
