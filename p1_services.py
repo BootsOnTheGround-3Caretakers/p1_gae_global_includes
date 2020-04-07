@@ -110,6 +110,8 @@ class TaskArguments(object):
     s4t1_task_sequence_list = 'p1s4t1_task_sequence_list'
     s4t1_api_key = 'p1s4t1_api_key'
 
+    s6t1_datastore_name = 'p1s6t1_datastore_name'
+
     s8t3_fields = 'p1s8t3_fields'
 
 
@@ -137,6 +139,8 @@ class TaskNames(object):
     s3t4 = 'p1s3t4-modify-user-information'
 
     s4t1 = 'p1s4t1-create-external-transaction'
+
+    s6t1 = 'p1s6t1-replicate-datastore'
 
     s8t1 = 'p1s8t1-push-firebase-change'
     s8t2 = 'p1s8t2-mass-firebase-replication'
@@ -370,6 +374,23 @@ class CreateTransaction(ServiceInformation):
     task_list = [create_external_transaction]
 
 
+class MaintenanceTasks(ServiceInformation):
+    name = "maintenance-tasks"
+    service_id = "s6"
+
+    host_url = "https://{}-{}.appspot.com".format(name, app_id)
+
+    replicate_datastore = PageServer()
+    replicate_datastore.id = "t1"
+    replicate_datastore.method = "POST"
+    replicate_datastore.name = "p1s6t1-replicate-datastore"
+    replicate_datastore.url = "/p1s6t1-replicate-datastore"
+    replicate_datastore.ACL_rules = ""
+    replicate_datastore.user_uid = 1
+
+    task_list = [replicate_datastore]
+
+
 class FirebaseReplication(ServiceInformation):
     name = "firebase-replication"
     service_id = "s8"
@@ -400,6 +421,9 @@ class Services(object):
     modify_joins = ModifyJoins
     create_transaction = CreateTransaction
     web_request = WebRequests
+    maintenance_tasks = MaintenanceTasks
     firebase_replication = FirebaseReplication
 
-    service_list = [create_entities, modify_joins, create_transaction, web_request, firebase_replication]
+    service_list = [
+        create_entities, modify_joins, create_transaction, web_request, maintenance_tasks, firebase_replication,
+    ]
