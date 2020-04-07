@@ -1468,12 +1468,16 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     last_name = ndb.StringProperty(required=True)
     _rule_last_name = [True, unicode, "len1"]
     phone_1 = ndb.StringProperty(required=False)
-    _rule_phone_1 = [True, unicode,"len1"] #
+    _rule_phone_1 = [False, unicode,"len1"]
     phone_texts = ndb.StringProperty(required=False, default="bbb")
     _rule_phone_texts = [False, unicode, "phoneTextValidator"]
+    phone_2 = ndb.StringProperty(required=False)
+    _rule_phone_2 = [False, unicode,"len1"]
+    emergency_contact = ndb.StringProperty(required=False)
+    _rule_emergency_contact = [False, unicode,"len1"]
     home_address = ndb.StringProperty(required=False)
     _rule_home_address = [False, unicode, "len1"]
-    email_address = ndb.StringProperty(required=False) # Required to become admin
+    email_address = ndb.StringProperty(required=False)  # Required to become admin
     _rule_email_address = [False, unicode, "len1"]
     firebase_uid = ndb.StringProperty(required=False)
     _rule_firebase_uid = [False, unicode, "len1"]
@@ -1487,9 +1491,9 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     _rule_description = [False, unicode, "len1"]
     preferred_radius = ndb.IntegerProperty(required=False)
     _rule_preferred_radius = [False, "bigint", "greater0"]
-    account_flags = ndb.StringProperty(required=False) # see UML for details
+    account_flags = ndb.StringProperty(required=False)  # see UML for details
     _rule_account_flags = [False, unicode, "len1"]
-    location_cords = ndb.GeoPtProperty(required=False) # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
+    location_cords = ndb.GeoPtProperty(required=False)  # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
     _rule_location_cords = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):

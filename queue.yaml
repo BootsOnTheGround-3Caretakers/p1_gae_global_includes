@@ -76,6 +76,11 @@ queue:
   target: modify-joins
   rate: 1/s
 
+- name: p1s2t10-modify-user-information
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
 - name: p1s6t1-replicate-datastore
   mode: push
   target: maintenance-tasks
