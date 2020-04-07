@@ -77,6 +77,25 @@ class TaskArguments(object):
     s2t9_user_uid = 'p1s2t9_user_uid'
     s2t9_skill_uid = 'p1s2t9_skill_uid'
 
+    s2t10_user_uid = 'p1s2t10_user_uid'
+    s2t10_first_name = 'p1s2t10_first_name'
+    s2t10_last_name = 'p1s2t10_last_name'
+    s2t10_phone_number = 'p1s2t10_phone_number'
+    s2t10_phone_texts = 'p1s2t10_phone_texts'
+    s2t10_phone_2 = 'p1s2t10_phone_2'
+    s2t10_emergency_contact = 'p1s2t10_emergency_contact'
+    s2t10_home_address = 'p1s2t10_home_address'
+    s2t10_email_address = 'p1s2t10_email_address'
+    s2t10_firebase_uid = 'p1s2t10_firebase_uid'
+    s2t10_country_uid = 'p1s2t10_country_uid'
+    s2t10_region_uid = 'p1s2t10_region_uid'
+    s2t10_area_uid = 'p1s2t10_area_uid'
+    s2t10_description = 'p1s2t10_description'
+    s2t10_preferred_radius = 'p1s2t10_preferred_radius'
+    s2t10_account_flags = 'p1s2t10_account_flags'
+    s2t10_location_cord_lat = 'p1s2t10_location_cord_lat'
+    s2t10_location_cord_long = 'p1s2t10_location_cord_long'
+
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
 
@@ -132,6 +151,7 @@ class TaskNames(object):
     s2t7 = 'p1s2t7-assign-hashtag-to-user'
     s2t8 = 'p1s2t8-remove-hashtag-from-user'
     s2t9 = 'p1s2t9-remove-skill-from-user'
+    s2t10 = 'p1s2t10-modify-user-information'
 
     s3t1 = 'p1s3t1-create-need'
     s3t2 = 'p1s3t2-assign-need-to-needer'
@@ -307,10 +327,26 @@ class ModifyJoins(ServiceInformation):
     remove_skill_from_user.ACL_rules = ""
     remove_skill_from_user.user_uid = 1
 
+    remove_skill_from_user = TaskInformation()
+    remove_skill_from_user.id = "t9"
+    remove_skill_from_user.method = "POST"
+    remove_skill_from_user.name = "p1s2t9-remove-skill-from-user"
+    remove_skill_from_user.url = "/p1s2t9-remove-skill-from-user"
+    remove_skill_from_user.ACL_rules = ""
+    remove_skill_from_user.user_uid = 1
+
+    modify_user_information = TaskInformation()
+    modify_user_information.id = "t10"
+    modify_user_information.method = "POST"
+    modify_user_information.name = "p1s2t10-modify-user-information"
+    modify_user_information.url = "/p1s2t10-modify-user-information"
+    modify_user_information.ACL_rules = ""
+    modify_user_information.user_uid = 1
+
     task_list = [
         add_modify_cluster_user, remove_user_from_cluster, add_modify_user_skill, add_modify_need_to_needer,
         remove_need_from_needer, remove_needer_from_user, assign_hashtag_to_user, remove_hashtag_from_user,
-        remove_skill_from_user,
+        remove_skill_from_user, modify_user_information,
     ]
 
 
