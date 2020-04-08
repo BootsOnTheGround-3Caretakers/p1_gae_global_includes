@@ -1089,63 +1089,7 @@ class ReplicateToFirebase(object):
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
 
-        # get users in the area
-        users_query = DsP1Users.query(ndb.AND(
-            DsP1Users.country_uid == country_uid, DsP1Users.region_uid == region_uid, DsP1Users.area_uid == area_uid,
-        ))
-        call_result = DSF.kfetch(users_query, keys_only=True)
-        if call_result['success'] != RC.success:
-            return_msg += "fetch of users failed"
-            return {
-                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
-                'firebase_fields': firebase_fields
-            }
-        user_keys = call_result['fetch_result']
-        #</end> get users in the area
 
-        # get clusters of the users
-        cluster_joins_query = DsP1UserClusterJoins.query(
-            DsP1UserClusterJoins.user_uid.IN([unicode(user_key.id()) for user_key in user_keys])
-        )
-        call_result = DSF.kfetch(cluster_joins_query, keys_only=True)
-        if call_result['success'] != RC.success:
-            return_msg += "fetch of cluster_joins failed"
-            return {
-                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
-                'firebase_fields': firebase_fields
-            }
-        cluster_joins = call_result['fetch_result']
-        #</end> get clusters of the users
-
-        if cluster_joins:
-            firebase_location = "cluster_search_data/{}/{}/{}/".format(country_uid, region_uid, area_uid)
-
-            if len(cluster_joins) == 1:
-                simple_entries = [
-                    ["", FF.keys.cluster_uid, unicode(cluster_joins[0].cluster_uid)],
-                ]
-            else:
-                simple_entries = []
-                for i, cluster_join in enumerate(cluster_joins):
-                    simple_entries.append(
-                        [unicode(i + 1), FF.keys.cluster_uid, unicode(cluster_join.cluster_uid)]
-                    )
-
-            for entry in simple_entries:
-                if entry[2] is None:
-                    continue
-
-                firebase_entry = FF()
-                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
-                                                            FF.object_types.object,
-                                                            FF.functions.update,
-                                                            entry[2],
-                                                            entry[1])
-                debug_data.append(call_result)
-                call_result = firebase_entry.toDict()
-                debug_data.append(call_result)
-                generated_fields.append(call_result['field'])
-                debug_data_count = debug_data_count + 2
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
