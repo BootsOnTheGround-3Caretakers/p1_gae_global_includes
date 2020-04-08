@@ -74,39 +74,22 @@ class ReplicateToFirebase(object):
 
         ## </end> input validation
 
-        kind_names = [
-            "DsP1Users",
-            "DsP1Needs",
-            "DsP1CaretakerSkills",
-            "DsP1SkillsSatisfiesNeeds",
-            "DsP1HashTags",
-            "DsP1Cluster",
-            "DsP1UserClusterJoins",
-            "DsP1CountryCodes",
-            "DsP1RegionCodes",
-            "DsP1AreaCodes",
-            "DsP1CaretakerSkillsJoins",
-            "DsP1SkillJoinsUnusedCapacityNow",
-            "DsP1Needer",
-            "DsP1NeederNeedsJoins",
-        ]
-
-        kind_functions = [
-            self.__DsP1Users,
-            self.__DsP1Needs,
-            self.__DsP1CaretakerSkills,
-            self.__DsP1SkillsSatisfiesNeeds,
-            self.__DsP1HashTags,
-            self.__DsP1Cluster,
-            self.__DsP1UserClusterJoins,
-            self.__DsP1CountryCodes,
-            self.__DsP1RegionCodes,
-            self.__DsP1AreaCodes,
-            self.__DsP1CaretakerSkillsJoins,
-            self.__DsP1SkillJoinsUnusedCapacityNow,
-            self.__DsP1Needer,
-            self.__DsP1NeederNeedsJoins,
-        ]
+        kind_functions = {
+            "DsP1Users": self.__DsP1Users,
+            "DsP1Needs": self.__DsP1Needs,
+            "DsP1CaretakerSkills": self.__DsP1CaretakerSkills,
+            "DsP1SkillsSatisfiesNeeds": self.__DsP1SkillsSatisfiesNeeds,
+            "DsP1HashTags": self.__DsP1HashTags,
+            "DsP1Cluster": self.__DsP1Cluster,
+            "DsP1UserClusterJoins": self.__DsP1UserClusterJoins,
+            "DsP1CountryCodes": self.__DsP1CountryCodes,
+            "DsP1RegionCodes": self.__DsP1RegionCodes,
+            "DsP1AreaCodes": self.__DsP1AreaCodes,
+            "DsP1CaretakerSkillsJoins": self.__DsP1CaretakerSkillsJoins,
+            "DsP1SkillJoinsUnusedCapacityNow": self.__DsP1SkillJoinsUnusedCapacityNow,
+            "DsP1Needer": self.__DsP1Needer,
+            "DsP1NeederNeedsJoins": self.__DsP1NeederNeedsJoins,
+        }
 
         ## process each entity and add it to the list to send to firebase
         firebase_fields = []
@@ -123,19 +106,19 @@ class ReplicateToFirebase(object):
                 entity_id = unicode(entity_id)
 
             kind_found = False
-            for index1, kind in enumerate(kind_names):
-                if entity_kind == kind:
-                    kind_found = True
-                    call_result = kind_functions[index1](entity_id, entity, delete_flag)
-                    debug_data.append(call_result)
-                    if call_result['success'] != RC.success:
-                        return_msg += "replicating kind values for kind %s name/id %s failed" % (kind, entity_id)
-                        return {'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data}
 
-                    firebase_fields += call_result['firebase_fields']
-                    break
+            if entity_kind in kind_functions:
+                kind_found = True
+                call_result = kind_functions[entity_kind](entity_id, entity, delete_flag)
+                debug_data.append(call_result)
+                if call_result['success'] != RC.success:
+                    return_msg += "replicating kind values for kind %s name/id %s failed" % (entity_kind, entity_id)
+                    return {'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data}
 
-            if kind_found != True:
+                firebase_fields += call_result['firebase_fields']
+
+
+            if kind_found is not True:
                 return_msg += "could not find a function entry for kind:%s" % entity_kind
                 logging.warning(return_msg)
 
@@ -273,6 +256,9 @@ class ReplicateToFirebase(object):
             ["", FF.keys.user_last_name, entity_fields['last_name']],
             ["", FF.keys.user_contact_email, entity_fields['email_address']],
             ["", FF.keys.account_flags, entity_fields['account_flags']],
+            ["", FF.keys.country_uid, entity_fields['country_uid']],
+            ["", FF.keys.region_uid, entity_fields['region_uid']],
+            ["", FF.keys.area_uid, entity_fields['area_uid']],
             ["", FF.keys.deletion_prevention_key,  FF.keys.deletion_prevention_key],
             ["clusters/", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
             ["needers/", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
@@ -750,7 +736,7 @@ class ReplicateToFirebase(object):
         debug_data_count = 0
         generated_fields = []
 
-        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        # we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
         if call_result['success'] != RC.success:
             return_msg += "get of Cluster record failed"
@@ -758,7 +744,7 @@ class ReplicateToFirebase(object):
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
-        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+        # </end> we need to get all the values in the record we are updating so we can put all needed info in firebase
 
         # get current joins user whose info will be propagated to other all other cluster members
         current_joins_user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
@@ -766,11 +752,11 @@ class ReplicateToFirebase(object):
         debug_data.append(call_result)
         if call_result['success'] != RC.success:
             return_msg += "failed to get user of cluster joins {}".format(entity_id)
-            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'firebase_fields': firebase_fields}
+            return {'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
 
         current_joins_user = call_result['get_result']
-        #</end> get current joins user whose info will be propagated to other all other cluster members
+        # </end> get current joins user whose info will be propagated to other all other cluster members
 
         ## Get all cluster joins members
         try:
@@ -778,7 +764,7 @@ class ReplicateToFirebase(object):
             joins_query = DsP1UserClusterJoins.query(ancestor=cluster_key)
             cluster_joins = joins_query.fetch(deadline=60)
         except Exception as error:
-            return_msg += EF.parseException("fetching user cluster joins",error)
+            return_msg += EF.parseException("fetching user cluster joins", error)
             return {
                 'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
                 'firebase_fields': firebase_fields
@@ -793,35 +779,50 @@ class ReplicateToFirebase(object):
                 entity_user_in_fetch_results = True
             cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(cluster_join.user_uid)))
 
+        # when adding a new user to cluster, they won't show up in the results yet
+        if entity_user_in_fetch_results is False:
+            cluster_member_roles[unicode(entity.user_uid)] = entity.roles
+            cluster_member_keys.append(ndb.Key(DsP1Users._get_kind(), long(entity.user_uid)))
+
         call_result = DSF.kget_multi(cluster_member_keys)
         debug_data.append(call_result)
         if call_result['success'] != RC.success:
             return_msg += "failed to get members of cluster {}".format(entity_id)
-            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
-                'firebase_fields': firebase_fields}
+            return {'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
+                    'firebase_fields': firebase_fields}
 
         cluster_members = call_result['get_result']
         ##</end> Get all cluster joins member
 
         last_updated = unicode(int(time.time()))
 
-        # Prepare the changes of the current joins entity to be propagated to all other cluster members
-        current_member_dir = "{}/users/{}".format(entity.cluster_uid, entity.user_uid)
-        simple_entries = [
-            ["", FF.keys.last_updated, last_updated],
-            [unicode(entity.cluster_uid), FF.keys.last_updated, last_updated],
-            ["{}/users".format(entity.cluster_uid), FF.keys.last_updated, last_updated],
-            [current_member_dir, FF.keys.user_uid, unicode(entity.user_uid)],
-            [current_member_dir, FF.keys.user_first_name, current_joins_user.first_name],
-            [current_member_dir, FF.keys.user_last_name, current_joins_user.last_name],
-            [current_member_dir, FF.keys.phone_1, current_joins_user.phone_1],
-            [current_member_dir, FF.keys.user_contact_email, current_joins_user.email_address],
-            [current_member_dir, FF.keys.roles, entity.roles],
-            [current_member_dir, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
-        ]
-        #</end> Prepare the changes of the current joins entity to be propagated to all other cluster members
 
-        # IN THIS LOOP we actually propagating the current joins to all other cluster members
+        ### process replication for /users/X/clusters/Y folders
+        simple_entries =[]
+        for entry in cluster_members:
+            user_uid = entry.key.integer_id()
+            current_member_dir = "{}/users/{}".format(entity.cluster_uid, user_uid)
+
+            if delete_flag is True:
+                simple_entries += [
+                    [current_member_dir, FF.keys.last_updated, "delete" + unicode(last_updated)],
+                    ]
+                continue
+
+            user_uid_str = unicode(user_uid)
+            simple_entries += [
+                [current_member_dir, FF.keys.user_uid, user_uid_str],
+                [current_member_dir, FF.keys.user_first_name, entry.first_name],
+                [current_member_dir, FF.keys.user_last_name, entry.last_name],
+                [current_member_dir, FF.keys.phone_1, entry.phone_1],
+                [current_member_dir, FF.keys.user_contact_email, entry.email_address],
+                [current_member_dir, FF.keys.last_updated, last_updated],
+            ]
+
+            if user_uid_str in cluster_member_roles:
+                simple_entries.append([current_member_dir, FF.keys.roles, cluster_member_roles[user_uid_str]])
+
+
         for cluster_member in cluster_members:
             if not cluster_member.firebase_uid:
                 continue
@@ -844,13 +845,15 @@ class ReplicateToFirebase(object):
                 debug_data.append(call_result)
                 generated_fields.append(call_result['field'])
                 debug_data_count = debug_data_count + 2
-        #</end> IN THIS LOOP we actually propagating the current joins to all other cluster members
+            ##</end> process all the simple entries
 
+        ###</end> process replication for /users/X/clusters/Y folders
+
+        ## process replication for /clusters/X folder
         firebase_location = "clusters/{}/".format(entity.cluster_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles],
-            ["users/{}".format(entity.user_uid), FF.keys.last_updated, "deleted" if delete_flag else last_updated],
+            ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles]
         ]
 
         ## process all the simple entries
@@ -871,10 +874,15 @@ class ReplicateToFirebase(object):
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
 
+        ##</end> process replication for /clusters/X folder
+
+
+        ## process replication for /clusters_last_updated/X folder
         firebase_location = "clusters_last_updated/"
 
-        #format for each entry is [folder_path,key,value]
         now = datetime.datetime.utcnow()
+        # format for each entry is [folder_path,key,value]
+        #FIXME this should only replicate the needer location data for the last updated information
         simple_entries = [
             ["{}/{}/{}/{:04d}-{:02d}-{:02d}/{:02d}/{}".format(
                 current_joins_user.country_uid, current_joins_user.region_uid, current_joins_user.area_uid,
@@ -898,7 +906,9 @@ class ReplicateToFirebase(object):
             debug_data.append(call_result)
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
-        ##</end> set all last updated flags, this has to be done last
+
+        ##</end> process replication for /clusters_last_updated/X folder
+
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
