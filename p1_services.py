@@ -116,6 +116,7 @@ class TaskArguments(object):
     s3t4_phone_2 = 'p1s3t4_phone_2'
     s3t4_emergency_contact = 'p1s3t4_emergency_contact'
     s3t4_home_address = 'p1s3t4_home_address'
+    s3t4_email_address = 'p1s3t4_email_address'
     s3t4_firebase_uid = 'p1s3t4_firebase_uid'
     s3t4_country_uid = 'p1s3t4_country_uid'
     s3t4_region_uid = 'p1s3t4_region_uid'
@@ -129,7 +130,7 @@ class TaskArguments(object):
     s3t6_skill_name = 'p1s3t6_skill_name'
     s3t6_description = 'p1s3t6_description'
     s3t6_skill_type = 'p1s3t6_skill_type'
-    s3t6_certification_needed = 'p1s3t6_certification_needed'
+    s3t6_certifications_needed = 'p1s3t6_certifications_needed'
 
     s3t7_user_uid = 'p1s3t7_user_uid'
     s3t7_skill_uid = 'p1s3t7_skill_uid'

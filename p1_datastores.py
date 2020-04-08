@@ -1467,6 +1467,8 @@ class DsP1CaretakerSkills(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFi
     _rule_description = [False, unicode, "len1"]
     skill_type = ndb.StringProperty(required=True)
     _rule_skill_type = [True, unicode, "len1"]
+    certifications_needed = ndb.StringProperty(required=False)
+    _rule_certifications_needed = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillPointer(ndb.Model, DSF):
     skill_uid = ndb.IntegerProperty(required=True)
@@ -1486,7 +1488,7 @@ class DsP1Cluster(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     needer_uid = ndb.IntegerProperty(required=True)
     _rule_needer_uid = [True, long, "bigint", "greater0"]
     expiration_date = ndb.DateTimeProperty(required=False)
-    _rule_expiration_date = [True, datetime.datetime]
+    _rule_expiration_date = [False, datetime.datetime]
     user_uid = ndb.IntegerProperty(required=True)
     _rule_user_uid = [True, long, "bigint", "greater0"]
 
