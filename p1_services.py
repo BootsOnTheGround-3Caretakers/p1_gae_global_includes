@@ -126,6 +126,31 @@ class TaskArguments(object):
     s3t4_location_cord_long = 'p1s3t4_location_cord_long'
     s3t4_location_cord_lat = 'p1s3t4_location_cord_lat'
 
+    s3t6_skill_name = 'p1s3t6_skill_name'
+    s3t6_description = 'p1s3t6_description'
+    s3t6_skill_type = 'p1s3t6_skill_type'
+    s3t6_certification_needed = 'p1s3t6_certification_needed'
+
+    s3t7_user_uid = 'p1s3t7_user_uid'
+    s3t7_skill_uid = 'p1s3t7_skill_uid'
+    s3t7_special_notes = 'p1s3t7_special_notes'
+
+    s3t8_needer_uid = 'p1s3t8_needer_uid'
+    s3t8_expiration_date = 'p1s3t8_expiration_date'
+    s3t8_user_uid = 'p1s3t8_user_uid'
+
+    s3t9_cluster_uid = 'p1s3t9_cluster_uid'
+    s3t9_user_uid = 'p1s3t9_user_uid'
+    s3t9_roles = 'p1s3t9_roles'
+
+    s3t10_cluster_uid = 'p1s3t10_cluster_uid'
+    s3t10_user_uid = 'p1s3t10_user_uid'
+
+    s3t11_name = 'p1s3t11_name'
+    s3t11_description = 'p1s3t11_description'
+
+    s3t12_user_uid = 'p1s3t12_user_uid'
+
     s4t1_task_sequence_list = 'p1s4t1_task_sequence_list'
     s4t1_api_key = 'p1s4t1_api_key'
 
@@ -157,6 +182,13 @@ class TaskNames(object):
     s3t2 = 'p1s3t2-assign-need-to-needer'
     s3t3 = 'p1s3t3-create-user'
     s3t4 = 'p1s3t4-modify-user-information'
+    s3t6 = 'p1s3t6-create-skill'
+    s3t7 = 'p1s3t7-add-skill-to-user'
+    s3t8 = 'p1s3t8-create-cluster'
+    s3t9 = 'p1s3t9-add-modify-user-to-existing-cluster'
+    s3t10 = 'p1s3t10-remove-user-from-cluster'
+    s3t11 = 'p1s3t11-add-hashtag'
+    s3t12 = 'p1s3t12-create-needer-request'
 
     s4t1 = 'p1s4t1-create-external-transaction'
 
@@ -388,8 +420,66 @@ class WebRequests(ServiceInformation):
     modify_user_information.ACL_rules = ""
     modify_user_information.user_uid = 1
 
+    create_skill = PageServer()
+    create_skill.id = "t6"
+    create_skill.method = "POST"
+    create_skill.name = "p1s3t6-create-skill"
+    create_skill.url = "/p1s3t6-create-skill"
+    create_skill.ACL_rules = ""
+    create_skill.user_uid = 1
+
+    add_skill_to_user = PageServer()
+    add_skill_to_user.id = "t7"
+    add_skill_to_user.method = "POST"
+    add_skill_to_user.name = "p1s3t7-add-skill-to-user"
+    add_skill_to_user.url = "/p1s3t7-add-skill-to-user"
+    add_skill_to_user.ACL_rules = ""
+    add_skill_to_user.user_uid = 1
+
+    create_cluster = PageServer()
+    create_cluster.id = "t8"
+    create_cluster.method = "POST"
+    create_cluster.name = "p1s3t8-create-cluster"
+    create_cluster.url = "/p1s3t8-create-cluster"
+    create_cluster.ACL_rules = ""
+    create_cluster.user_uid = 1
+
+    add_modify_user_to_existing_cluster = PageServer()
+    add_modify_user_to_existing_cluster.id = "t9"
+    add_modify_user_to_existing_cluster.method = "POST"
+    add_modify_user_to_existing_cluster.name = "p1s3t9-add-modify-user-to-existing-cluster"
+    add_modify_user_to_existing_cluster.url = "/p1s3t9-add-modify-user-to-existing-cluster"
+    add_modify_user_to_existing_cluster.ACL_rules = ""
+    add_modify_user_to_existing_cluster.user_uid = 1
+
+    remove_user_from_cluster = PageServer()
+    remove_user_from_cluster.id = "t10"
+    remove_user_from_cluster.method = "POST"
+    remove_user_from_cluster.name = "p1s3t10-remove-user-from-cluster"
+    remove_user_from_cluster.url = "/p1s3t10-remove-user-from-cluster"
+    remove_user_from_cluster.ACL_rules = ""
+    remove_user_from_cluster.user_uid = 1
+
+    add_hashtag = PageServer()
+    add_hashtag.id = "t11"
+    add_hashtag.method = "POST"
+    add_hashtag.name = "p1s3t11-add-hashtag"
+    add_hashtag.url = "/p1s3t11-add-hashtag"
+    add_hashtag.ACL_rules = ""
+    add_hashtag.user_uid = 1
+
+    create_needer_request = PageServer()
+    create_needer_request.id = "t12"
+    create_needer_request.method = "POST"
+    create_needer_request.name = "p1s3t12-create-needer-request"
+    create_needer_request.url = "/p1s3t12-create-needer-request"
+    create_needer_request.ACL_rules = ""
+    create_needer_request.user_uid = 1
+
     task_list = [
-        create_need, assign_need_to_needer, create_user, modify_user_information
+        create_need, assign_need_to_needer, create_user, modify_user_information, create_skill, add_skill_to_user,
+        create_cluster, add_modify_user_to_existing_cluster, remove_user_from_cluster, add_hashtag,
+        create_needer_request
     ]
 
 
