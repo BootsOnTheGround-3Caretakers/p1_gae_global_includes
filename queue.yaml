@@ -81,6 +81,11 @@ queue:
   target: modify-joins
   rate: 1/s
 
+- name: p1s2t11-associate-skill-with-need
+  mode: push
+  target: modify-joins
+  rate: 1/s
+
 - name: p1s6t1-replicate-datastore
   mode: push
   target: maintenance-tasks
