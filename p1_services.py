@@ -96,6 +96,9 @@ class TaskArguments(object):
     s2t10_location_cord_lat = 'p1s2t10_location_cord_lat'
     s2t10_location_cord_long = 'p1s2t10_location_cord_long'
 
+    s2t11_skill_uid = 'p1s2t11_skill_uid'
+    s2t11_need_uid = 'p1s2t11_need_uid'
+
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
 
@@ -178,6 +181,7 @@ class TaskNames(object):
     s2t8 = 'p1s2t8-remove-hashtag-from-user'
     s2t9 = 'p1s2t9-remove-skill-from-user'
     s2t10 = 'p1s2t10-modify-user-information'
+    s2t11 = 'p1s2t11-associate-skill-with-need'
 
     s3t1 = 'p1s3t1-create-need'
     s3t2 = 'p1s3t2-assign-need-to-needer'
@@ -376,10 +380,18 @@ class ModifyJoins(ServiceInformation):
     modify_user_information.ACL_rules = ""
     modify_user_information.user_uid = 1
 
+    associate_skill_with_need = TaskInformation()
+    associate_skill_with_need.id = "t11"
+    associate_skill_with_need.method = "POST"
+    associate_skill_with_need.name = "p1s2t11-associate-skill-with-need"
+    associate_skill_with_need.url = "/p1s2t11-associate-skill-with-need"
+    associate_skill_with_need.ACL_rules = ""
+    associate_skill_with_need.user_uid = 1
+
     task_list = [
         add_modify_cluster_user, remove_user_from_cluster, add_modify_user_skill, add_modify_need_to_needer,
         remove_need_from_needer, remove_needer_from_user, assign_hashtag_to_user, remove_hashtag_from_user,
-        remove_skill_from_user, modify_user_information,
+        remove_skill_from_user, modify_user_information, associate_skill_with_need,
     ]
 
 
