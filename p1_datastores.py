@@ -1213,7 +1213,7 @@ class ReplicateToFirebase(object):
         #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
 
         # get skill joins
-        joins_query = DsP1CaretakerSkillsJoins.query(DsP1CaretakerSkillsJoins.skill_uid == entity_id)
+        joins_query = DsP1CaretakerSkillsJoins.query(DsP1CaretakerSkillsJoins.skill_uid == long(entity_id))
         call_result = DSF.kfetch(joins_query)
         if call_result['success'] != RC.success:
             return_msg += "fetch of skill joins failed"
@@ -1247,7 +1247,7 @@ class ReplicateToFirebase(object):
             )
 
             simple_entries = [
-                ["{}|{}".format(user.key.id(), entity_id), FF.keys.unused_capacity_now, entity.unused_capacity_now],
+                ["{}|{}".format(user.key.id(), entity_id), FF.keys.unused_capacity_now, unicode(entity.unused_capacity_now)],
             ]
 
             for entry in simple_entries:
@@ -1541,7 +1541,7 @@ class DsP1NeederNeedsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToF
 
 class DsP1Needs(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     need_name = ndb.StringProperty(required=True)
-    _rule_need_name = [True, unicode, "len1"] 
+    _rule_need_name = [True, unicode, "len1"]
     requirements = ndb.TextProperty(required=False)
     _rule_requirements = [False, unicode, "len1"]
 
@@ -1587,7 +1587,7 @@ class Datastores():
     needs = DsP1Needs
     needer = DsP1Needer
     created_uids_log = DsP1CreatedUidsLog
-    hashtags = DsP1HashTags 
+    hashtags = DsP1HashTags
     hashtag_pointer = DsP1HashTagPointer
 
     # used for deleting the entire datastore, just add the variable name to this list when you add a new datastore
