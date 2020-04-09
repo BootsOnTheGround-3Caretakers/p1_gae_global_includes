@@ -1448,7 +1448,7 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     account_flags = ndb.StringProperty(required=False)  # see UML for details
     _rule_account_flags = [False, unicode, "len1"]
     location_cords = ndb.GeoPtProperty(required=False)  # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
-    _rule_location_cords = [False, unicode, "len1"]
+    _rule_location_cords = [False, ndb.GeoPt]
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.IntegerProperty(required=True)
