@@ -158,6 +158,14 @@ class TaskArguments(object):
     s4t1_task_sequence_list = 'p1s4t1_task_sequence_list'
     s4t1_api_key = 'p1s4t1_api_key'
 
+    s5t1_phone_number = 'p1s5t1_phone_number'
+    s5t1_requesting_user_uid = 'p1s5t1_requesting_user_uid'
+    s5t1_user_uid = 'p1s5t1_user_uid'
+
+    s5t2_phone_number = 'p1s5t2_phone_number'
+    s5t2_user_uid = 'p1s5t2_user_uid'
+    s5t2_cluster_uids = 'p1s5t2_cluster_uids'
+
     s6t1_datastore_name = 'p1s6t1_datastore_name'
 
     s8t3_fields = 'p1s8t3_fields'
@@ -197,10 +205,13 @@ class TaskNames(object):
 
     s4t1 = 'p1s4t1-create-external-transaction'
 
+    s5t1 = 'p1s5t1-get-user-profile'
+    s5t2 = 'p1s5t2-get-cluster-data'
+
     s6t1 = 'p1s6t1-replicate-datastore'
 
-    s8t1 = 'p1s8t1-push-firebase-change'
-    s8t2 = 'p1s8t2-mass-firebase-replication'
+    s8t3 = "p1s8t3-push-firebase-change"
+    s8t4 = "p1s8t4-mass-firebase-replication"
 
 
 class TaskInformation(object):
@@ -238,48 +249,48 @@ class CreateEntities(ServiceInformation):
     create_need = TaskInformation()
     create_need.id = "t1"
     create_need.method = "POST"
-    create_need.name = "p1s1t1-create-need"
-    create_need.url = "/p1s1t1-create-need"
+    create_need.name = TaskNames.s1t1
+    create_need.url = "/" + TaskNames.s1t1
     create_need.ACL_rules = ""
     create_need.user_uid = 1
 
     create_hashtag = TaskInformation()
     create_hashtag.id = "t2"
     create_hashtag.method = "POST"
-    create_hashtag.name = "p1s1t2-create-hashtag"
-    create_hashtag.url = "/p1s1t2-create-hashtag"
+    create_hashtag.name = TaskNames.s1t2
+    create_hashtag.url = "/" + TaskNames.s1t2
     create_hashtag.ACL_rules = ""
     create_hashtag.user_uid = 1
 
     create_needer = TaskInformation()
     create_needer.id = "t3"
     create_needer.method = "POST"
-    create_needer.name = "p1s1t3-create-needer"
-    create_needer.url = "/p1s1t3-create-needer"
+    create_needer.name = TaskNames.s1t3
+    create_needer.url = "/" + TaskNames.s1t3
     create_needer.ACL_rules = ""
     create_needer.user_uid = 1
 
     create_user = TaskInformation()
     create_user.id = "t4"
     create_user.method = "POST"
-    create_user.name = "p1s1t4-create-user"
-    create_user.url = "/p1s1t4-create-user"
+    create_user.name = TaskNames.s1t4
+    create_user.url = "/" + TaskNames.s1t4
     create_user.ACL_rules = ""
     create_user.user_uid = 1
 
     create_cluster = TaskInformation()
     create_cluster.id = "t5"
     create_cluster.method = "POST"
-    create_cluster.name = "p1s1t5-create-cluster"
-    create_cluster.url = "/p1s1t5-create-cluster"
+    create_cluster.name = TaskNames.s1t5
+    create_cluster.url = "/" + TaskNames.s1t5
     create_cluster.ACL_rules = ""
     create_cluster.user_uid = 1
 
     create_caretaker_skill = TaskInformation()
     create_caretaker_skill.id = "t6"
     create_caretaker_skill.method = "POST"
-    create_caretaker_skill.name = "p1s1t6-create-caretaker-skill"
-    create_caretaker_skill.url = "/p1s1t6-create-caretaker-skill"
+    create_caretaker_skill.name = TaskNames.s1t6
+    create_caretaker_skill.url = "/" + TaskNames.s1t6
     create_caretaker_skill.ACL_rules = ""
     create_caretaker_skill.user_uid = 1
 
@@ -295,96 +306,88 @@ class ModifyJoins(ServiceInformation):
     add_modify_cluster_user = TaskInformation()
     add_modify_cluster_user.id = "t1"
     add_modify_cluster_user.method = "POST"
-    add_modify_cluster_user.name = "p1s2t1-add-modify-cluster-user"
-    add_modify_cluster_user.url = "/p1s2t1-add-modify-cluster-user"
+    add_modify_cluster_user.name = TaskNames.s2t1
+    add_modify_cluster_user.url = "/" + TaskNames.s2t1
     add_modify_cluster_user.ACL_rules = ""
     add_modify_cluster_user.user_uid = 1
 
     remove_user_from_cluster = TaskInformation()
     remove_user_from_cluster.id = "t2"
     remove_user_from_cluster.method = "POST"
-    remove_user_from_cluster.name = "p1s2t2-remove-user-from-cluster"
-    remove_user_from_cluster.url = "/p1s2t2-remove-user-from-cluster"
+    remove_user_from_cluster.name = TaskNames.s2t2
+    remove_user_from_cluster.url = "/" + TaskNames.s2t2
     remove_user_from_cluster.ACL_rules = ""
     remove_user_from_cluster.user_uid = 1
 
     add_modify_user_skill = TaskInformation()
     add_modify_user_skill.id = "t3"
     add_modify_user_skill.method = "POST"
-    add_modify_user_skill.name = "p1s2t3-add-modify-user-skill"
-    add_modify_user_skill.url = "/p1s2t3-add-modify-user-skill"
+    add_modify_user_skill.name = TaskNames.s2t3
+    add_modify_user_skill.url = "/" + TaskNames.s2t3
     add_modify_user_skill.ACL_rules = ""
     add_modify_user_skill.user_uid = 1
 
     add_modify_need_to_needer = TaskInformation()
     add_modify_need_to_needer.id = "t4"
     add_modify_need_to_needer.method = "POST"
-    add_modify_need_to_needer.name = "p1s2t4-add-modify-need-to-needer"
-    add_modify_need_to_needer.url = "/p1s2t4-add-modify-need-to-needer"
+    add_modify_need_to_needer.name = TaskNames.s2t4
+    add_modify_need_to_needer.url = "/" + TaskNames.s2t4
     add_modify_need_to_needer.ACL_rules = ""
     add_modify_need_to_needer.user_uid = 1
 
     remove_need_from_needer = TaskInformation()
     remove_need_from_needer.id = "t5"
     remove_need_from_needer.method = "POST"
-    remove_need_from_needer.name = "p1s2t5-remove-need-from-needer"
-    remove_need_from_needer.url = "/p1s2t5-remove-need-from-needer"
+    remove_need_from_needer.name = TaskNames.s2t5
+    remove_need_from_needer.url = "/" + TaskNames.s2t5
     remove_need_from_needer.ACL_rules = ""
     remove_need_from_needer.user_uid = 1
 
     remove_needer_from_user = TaskInformation()
     remove_needer_from_user.id = "t6"
     remove_needer_from_user.method = "POST"
-    remove_needer_from_user.name = "p1s2t6-remove-needer-from-user"
-    remove_needer_from_user.url = "/p1s2t6-remove-needer-from-user"
+    remove_needer_from_user.name = TaskNames.s2t6
+    remove_needer_from_user.url = "/" + TaskNames.s2t6
     remove_needer_from_user.ACL_rules = ""
     remove_needer_from_user.user_uid = 1
 
     assign_hashtag_to_user = TaskInformation()
     assign_hashtag_to_user.id = "t7"
     assign_hashtag_to_user.method = "POST"
-    assign_hashtag_to_user.name = "p1s2t7-assign-hashtag-to-user"
-    assign_hashtag_to_user.url = "/p1s2t7-assign-hashtag-to-user"
+    assign_hashtag_to_user.name = TaskNames.s2t7
+    assign_hashtag_to_user.url = "/" + TaskNames.s2t7
     assign_hashtag_to_user.ACL_rules = ""
     assign_hashtag_to_user.user_uid = 1
 
     remove_hashtag_from_user = TaskInformation()
     remove_hashtag_from_user.id = "t8"
     remove_hashtag_from_user.method = "POST"
-    remove_hashtag_from_user.name = "p1s2t8-remove-hashtag-from-user"
-    remove_hashtag_from_user.url = "/p1s2t8-remove-hashtag-from-user"
+    remove_hashtag_from_user.name = TaskNames.s2t8
+    remove_hashtag_from_user.url = "/" + TaskNames.s2t8
     remove_hashtag_from_user.ACL_rules = ""
     remove_hashtag_from_user.user_uid = 1
 
     remove_skill_from_user = TaskInformation()
     remove_skill_from_user.id = "t9"
     remove_skill_from_user.method = "POST"
-    remove_skill_from_user.name = "p1s2t9-remove-skill-from-user"
-    remove_skill_from_user.url = "/p1s2t9-remove-skill-from-user"
-    remove_skill_from_user.ACL_rules = ""
-    remove_skill_from_user.user_uid = 1
-
-    remove_skill_from_user = TaskInformation()
-    remove_skill_from_user.id = "t9"
-    remove_skill_from_user.method = "POST"
-    remove_skill_from_user.name = "p1s2t9-remove-skill-from-user"
-    remove_skill_from_user.url = "/p1s2t9-remove-skill-from-user"
+    remove_skill_from_user.name = TaskNames.s2t9
+    remove_skill_from_user.url = "/" + TaskNames.s2t9
     remove_skill_from_user.ACL_rules = ""
     remove_skill_from_user.user_uid = 1
 
     modify_user_information = TaskInformation()
     modify_user_information.id = "t10"
     modify_user_information.method = "POST"
-    modify_user_information.name = "p1s2t10-modify-user-information"
-    modify_user_information.url = "/p1s2t10-modify-user-information"
+    modify_user_information.name = TaskNames.s2t10
+    modify_user_information.url = "/" + TaskNames.s2t10
     modify_user_information.ACL_rules = ""
     modify_user_information.user_uid = 1
 
     associate_skill_with_need = TaskInformation()
     associate_skill_with_need.id = "t11"
     associate_skill_with_need.method = "POST"
-    associate_skill_with_need.name = "p1s2t11-associate-skill-with-need"
-    associate_skill_with_need.url = "/p1s2t11-associate-skill-with-need"
+    associate_skill_with_need.name = TaskNames.s2t11
+    associate_skill_with_need.url = "/" + TaskNames.s2t11
     associate_skill_with_need.ACL_rules = ""
     associate_skill_with_need.user_uid = 1
 
@@ -404,88 +407,88 @@ class WebRequests(ServiceInformation):
     create_need = PageServer()
     create_need.id = "t1"
     create_need.method = "POST"
-    create_need.name = "p1s3t1-create-need"
-    create_need.url = "/p1s3t1-create-need"
+    create_need.name = TaskNames.s3t1
+    create_need.url = "/" + TaskNames.s3t1
     create_need.ACL_rules = ""
     create_need.user_uid = 1
 
     assign_need_to_needer = PageServer()
     assign_need_to_needer.id = "t2"
     assign_need_to_needer.method = "POST"
-    assign_need_to_needer.name = "p1s3t2-assign-need-to-needer"
-    assign_need_to_needer.url = "/p1s3t2-assign-need-to-needer"
+    assign_need_to_needer.name = TaskNames.s3t2
+    assign_need_to_needer.url = "/" + TaskNames.s3t2
     assign_need_to_needer.ACL_rules = ""
     assign_need_to_needer.user_uid = 1
 
     create_user = PageServer()
     create_user.id = "t3"
     create_user.method = "POST"
-    create_user.name = "p1s3t3-create-user"
-    create_user.url = "/p1s3t3-create-user"
+    create_user.name = TaskNames.s3t3
+    create_user.url = "/" + TaskNames.s3t3
     create_user.ACL_rules = ""
     create_user.user_uid = 1
 
     modify_user_information = PageServer()
     modify_user_information.id = "t4"
     modify_user_information.method = "POST"
-    modify_user_information.name = "p1s3t4-modify-user-information"
-    modify_user_information.url = "/p1s3t4-modify-user-information"
+    modify_user_information.name = TaskNames.s3t4
+    modify_user_information.url = "/" + TaskNames.s3t4
     modify_user_information.ACL_rules = ""
     modify_user_information.user_uid = 1
 
     create_skill = PageServer()
     create_skill.id = "t6"
     create_skill.method = "POST"
-    create_skill.name = "p1s3t6-create-skill"
-    create_skill.url = "/p1s3t6-create-skill"
+    create_skill.name = TaskNames.s3t6
+    create_skill.url = "/" + TaskNames.s3t6
     create_skill.ACL_rules = ""
     create_skill.user_uid = 1
 
     add_skill_to_user = PageServer()
     add_skill_to_user.id = "t7"
     add_skill_to_user.method = "POST"
-    add_skill_to_user.name = "p1s3t7-add-skill-to-user"
-    add_skill_to_user.url = "/p1s3t7-add-skill-to-user"
+    add_skill_to_user.name = TaskNames.s3t7
+    add_skill_to_user.url = "/" + TaskNames.s3t7
     add_skill_to_user.ACL_rules = ""
     add_skill_to_user.user_uid = 1
 
     create_cluster = PageServer()
     create_cluster.id = "t8"
     create_cluster.method = "POST"
-    create_cluster.name = "p1s3t8-create-cluster"
-    create_cluster.url = "/p1s3t8-create-cluster"
+    create_cluster.name = TaskNames.s3t8
+    create_cluster.url = "/" + TaskNames.s3t8
     create_cluster.ACL_rules = ""
     create_cluster.user_uid = 1
 
     add_modify_user_to_existing_cluster = PageServer()
     add_modify_user_to_existing_cluster.id = "t9"
     add_modify_user_to_existing_cluster.method = "POST"
-    add_modify_user_to_existing_cluster.name = "p1s3t9-add-modify-user-to-existing-cluster"
-    add_modify_user_to_existing_cluster.url = "/p1s3t9-add-modify-user-to-existing-cluster"
+    add_modify_user_to_existing_cluster.name = TaskNames.s3t9
+    add_modify_user_to_existing_cluster.url = "/" + TaskNames.s3t9
     add_modify_user_to_existing_cluster.ACL_rules = ""
     add_modify_user_to_existing_cluster.user_uid = 1
 
     remove_user_from_cluster = PageServer()
     remove_user_from_cluster.id = "t10"
     remove_user_from_cluster.method = "POST"
-    remove_user_from_cluster.name = "p1s3t10-remove-user-from-cluster"
-    remove_user_from_cluster.url = "/p1s3t10-remove-user-from-cluster"
+    remove_user_from_cluster.name = TaskNames.s3t10
+    remove_user_from_cluster.url = "/" + TaskNames.s3t10
     remove_user_from_cluster.ACL_rules = ""
     remove_user_from_cluster.user_uid = 1
 
     add_hashtag = PageServer()
     add_hashtag.id = "t11"
     add_hashtag.method = "POST"
-    add_hashtag.name = "p1s3t11-add-hashtag"
-    add_hashtag.url = "/p1s3t11-add-hashtag"
+    add_hashtag.name = TaskNames.s3t11
+    add_hashtag.url = "/" + TaskNames.s3t11
     add_hashtag.ACL_rules = ""
     add_hashtag.user_uid = 1
 
     create_needer_request = PageServer()
     create_needer_request.id = "t12"
     create_needer_request.method = "POST"
-    create_needer_request.name = "p1s3t12-create-needer-request"
-    create_needer_request.url = "/p1s3t12-create-needer-request"
+    create_needer_request.name = TaskNames.s3t12
+    create_needer_request.url = "/" + TaskNames.s3t12
     create_needer_request.ACL_rules = ""
     create_needer_request.user_uid = 1
 
@@ -505,12 +508,38 @@ class CreateTransaction(ServiceInformation):
     create_external_transaction = PageServer()
     create_external_transaction.id = "t1"
     create_external_transaction.method = "POST"
-    create_external_transaction.name = "p1s4t1-create-external-transaction"
-    create_external_transaction.url = "/p1s4t1-create-external-transaction"
+    create_external_transaction.name = TaskNames.s4t1
+    create_external_transaction.url = "/" + TaskNames.s4t1
     create_external_transaction.ACL_rules = ""
     create_external_transaction.user_uid = 1
 
     task_list = [create_external_transaction]
+
+
+class JsonRequests(ServiceInformation):
+    name = "json-requests"
+
+    service_id = "s5"
+
+    host_url = "https://{}-{}.appspot.com".format(name, app_id)
+
+    get_user_profile = PageServer()
+    get_user_profile.id = "t1"
+    get_user_profile.method = "POST"
+    get_user_profile.name = TaskNames.s5t1
+    get_user_profile.url = "/" + TaskNames.s5t1
+    get_user_profile.ACL_rules = ""
+    get_user_profile.user_uid = 1
+
+    get_cluster_data = PageServer()
+    get_cluster_data.id = "t2"
+    get_cluster_data.method = "POST"
+    get_cluster_data.name = TaskNames.s5t2
+    get_cluster_data.url = "/" + TaskNames.s5t2
+    get_cluster_data.ACL_rules = ""
+    get_cluster_data.user_uid = 1
+
+    task_list = [get_user_profile, get_cluster_data]
 
 
 class MaintenanceTasks(ServiceInformation):
@@ -522,8 +551,8 @@ class MaintenanceTasks(ServiceInformation):
     replicate_datastore = PageServer()
     replicate_datastore.id = "t1"
     replicate_datastore.method = "POST"
-    replicate_datastore.name = "p1s6t1-replicate-datastore"
-    replicate_datastore.url = "/p1s6t1-replicate-datastore"
+    replicate_datastore.name = TaskNames.s6t1
+    replicate_datastore.url = "/" + TaskNames.s6t1
     replicate_datastore.ACL_rules = ""
     replicate_datastore.user_uid = 1
 
@@ -537,16 +566,16 @@ class FirebaseReplication(ServiceInformation):
     push_firebase_change = TaskInformation()
     push_firebase_change.id = "t3"
     push_firebase_change.method = "POST"
-    push_firebase_change.name = "p1s8t3-push-firebase-change"
-    push_firebase_change.url = "/p1s8t3-push-firebase-change"
+    push_firebase_change.name = TaskNames.s8t3
+    push_firebase_change.url = "/" + TaskNames.s8t3
     push_firebase_change.ACL_rules = ""
     push_firebase_change.user_uid = 1
 
     push_mass_firebase_changes = TaskInformation()
     push_mass_firebase_changes.id = "t4"
     push_mass_firebase_changes.method = "POST"
-    push_mass_firebase_changes.name = "p1s8t4-mass-firebase-replication"
-    push_mass_firebase_changes.url = "/p1s8t4-mass-firebase-replication"
+    push_mass_firebase_changes.name = TaskNames.s8t4
+    push_mass_firebase_changes.url = "/" + TaskNames.s8t4
     push_mass_firebase_changes.ACL_rules = ""
     push_mass_firebase_changes.user_uid = 1
 
@@ -560,9 +589,11 @@ class Services(object):
     modify_joins = ModifyJoins
     create_transaction = CreateTransaction
     web_request = WebRequests
+    json_requests = JsonRequests
     maintenance_tasks = MaintenanceTasks
     firebase_replication = FirebaseReplication
 
     service_list = [
-        create_entities, modify_joins, create_transaction, web_request, maintenance_tasks, firebase_replication,
+        create_entities, modify_joins, create_transaction, web_request,
+        json_requests, maintenance_tasks, firebase_replication,
     ]
