@@ -1176,14 +1176,14 @@ class ReplicateToFirebase(object):
                 generated_fields.append(call_result['field'])
                 debug_data_count = debug_data_count + 2
 
-        firebase_location = "available_skills_search_data/{}/{}/{}/".format(
-            user.country_uid, user.region_uid, user.area_uid
+        firebase_location = "available_skills_search_data/{}/{}/{}/{}/{}/".format(
+            user.country_uid, user.region_uid, user.area_uid, entity.skill_uid, entity_id,
         )
 
         simple_entries = [
-            [entity_id, FF.keys.skill_join_uid, entity_id],
-            [entity_id, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
-            [entity_id, FF.keys.total_capacity, unicode(entity.total_capacity)],
+            ["", FF.keys.skill_join_uid, entity_id],
+            ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
+            ["", FF.keys.total_capacity, unicode(entity.total_capacity)],
         ]
 
         for entry in simple_entries:
