@@ -690,6 +690,25 @@ class ReplicateToFirebase(object):
             debug_data_count = debug_data_count + 2
         ##</end> process all the simple entries
 
+        # set clusters_search_data
+        firebase_entry = FF()
+        call_result = firebase_entry.setFieldValues(
+            "clusters_search_data/{}/{}/{}/".format(
+                needer_user.country_uid, needer_user.region_uid, needer_user.area_uid
+            ),
+            FF.object_types.object,
+            FF.functions.update,
+            entity_id,
+        )
+        debug_data.append(call_result)
+        call_result = firebase_entry.setManualKey(entity_id)
+        debug_data.append(call_result)
+        call_result = firebase_entry.toDict()
+        debug_data.append(call_result)
+        generated_fields.append(call_result['field'])
+        debug_data_count = debug_data_count + 2
+        #</end> set clusters_search_data
+
         firebase_location = "clusters_last_updated/"
 
         #format for each entry is [folder_path,key,value]
