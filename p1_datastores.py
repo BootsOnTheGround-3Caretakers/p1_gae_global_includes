@@ -1592,6 +1592,11 @@ class DsP1Admin(ndb.Model, DSF):
     _rule_user_uid = [True, long, "bigint", "greater0"]
 
 
+class DsP1RegisteredPhoneNumbers(ndb.Model, DSF):
+    user_uid = ndb.IntegerProperty(required=True)
+    _rule_user_uid = [True, long, "bigint", "greater0"]
+
+
 class Datastores():
     user_pointers = DsP1UserPointers
     users = DsP1Users
@@ -1615,11 +1620,12 @@ class Datastores():
     hashtags = DsP1HashTags
     hashtag_pointer = DsP1HashTagPointer
     admin = DsP1Admin
+    phone_numbers = DsP1RegisteredPhoneNumbers
 
     # used for deleting the entire datastore, just add the variable name to this list when you add a new datastore
     datastore_list = [
         user_pointers, users, caretaker_skills_joins,caretaker_skills, caretaker_skill_pointer,
         skills_satisfies_needs, skill_joins_unused_capacity_now, cluster, cluster_pointer, cluster_joins,
         country_codes, region_codes, area_codes, area_code_pointer, region_code_pointer,
-        needer_needs_joins, needs, needer, created_uids_log, hashtags, hashtag_pointer, admin
+        needer_needs_joins, needs, needer, created_uids_log, hashtags, hashtag_pointer, admin, phone_numbers
     ]
