@@ -870,9 +870,11 @@ class ReplicateToFirebase(object):
 
         ## process replication for /clusters/X folder
         firebase_location = "clusters/{}/".format(entity.cluster_uid)
+        cluster_user_dir = "users/{}".format(entity.user_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
-            ["users/{}".format(entity.user_uid), FF.keys.roles, entity.roles]
+            [cluster_user_dir, FF.keys.roles, entity.roles],
+            [cluster_user_dir, FF.keys.last_updated, last_updated],
         ]
 
         ## process all the simple entries
