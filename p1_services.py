@@ -168,6 +168,9 @@ class TaskArguments(object):
     s5t2_user_uid = 'p1s5t2_user_uid'
     s5t2_cluster_uids = 'p1s5t2_cluster_uids'
 
+    s5t3_email_address = 'p1s5t3_email_address'
+    s5t3_phone_number = 'p1s5t3_phone_number'
+
     s6t1_datastore_name = 'p1s6t1_datastore_name'
 
     s8t3_fields = 'p1s8t3_fields'
@@ -209,6 +212,7 @@ class TaskNames(object):
 
     s5t1 = 'p1s5t1-get-user-profile'
     s5t2 = 'p1s5t2-get-cluster-data'
+    s5t3 = 'p1s5t3-check-if-user-exists'
 
     s6t1 = 'p1s6t1-replicate-datastore'
 
@@ -541,7 +545,15 @@ class JsonRequests(ServiceInformation):
     get_cluster_data.ACL_rules = ""
     get_cluster_data.user_uid = 1
 
-    task_list = [get_user_profile, get_cluster_data]
+    check_if_user_exists = PageServer()
+    check_if_user_exists.id = "t3"
+    check_if_user_exists.method = "POST"
+    check_if_user_exists.name = TaskNames.s5t3
+    check_if_user_exists.url = "/" + TaskNames.s5t3
+    check_if_user_exists.ACL_rules = ""
+    check_if_user_exists.user_uid = 1
+
+    task_list = [get_user_profile, get_cluster_data, check_if_user_exists]
 
 
 class MaintenanceTasks(ServiceInformation):
