@@ -36,22 +36,22 @@ class ReplicateToFirebase(object):
         debug_data = []
         call_result = {}
         call_result = self.__replicateFromEntityList(entity_list, delete_flag)
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             logging.error(["errror updating firebase DB", call_result])
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data}
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
     def replicateEntityToFirebase(self, delete_flag=False):
         return_msg = "ReplicateToFirebase:replicateEntityToFirebase "
         debug_data = []
         call_result = {}
         call_result = self.__replicateFromEntityList([self], delete_flag)
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             logging.error(["errror updating firebase DB", call_result])
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data}
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
     def __replicateFromEntityList(self, entity_list, delete_flag=False):
         return_msg = "ReplicateToFirebase:replicateFromEntityList "
@@ -68,9 +68,9 @@ class ReplicateToFirebase(object):
                                         [delete_flag, True, bool]
                                         ])
         debug_data.append(call_result)
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             return_msg += "input validaiton failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data}
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
         ## </end> input validation
 
@@ -111,9 +111,9 @@ class ReplicateToFirebase(object):
                 kind_found = True
                 call_result = kind_functions[entity_kind](entity_id, entity, delete_flag)
                 debug_data.append(call_result)
-                if call_result['success'] != RC.success:
+                if call_result[RDK.success] != RC.success:
                     return_msg += "replicating kind values for kind %s name/id %s failed" % (entity_kind, entity_id)
-                    return {'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data}
+                    return {RDK.success: call_result[RDK.success], RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
                 firebase_fields += call_result['firebase_fields']
 
@@ -124,7 +124,7 @@ class ReplicateToFirebase(object):
 
         # nothing to send over
         if len(firebase_fields) < 1:
-            return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data}
+            return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
         params = {}
 
@@ -148,11 +148,11 @@ class ReplicateToFirebase(object):
         task_sequence = unicode(task_sequence)
         call_result = CTF.createTransaction("p1", "1", "firebase-replication", task_sequence, None, params)
         debug_data.append(call_result)
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             return_msg += "failed to create firebase replication transaction"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data}
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data}
 
     def getDict(self, entity, key_names=None,all_flag=False):
         return_msg = "ReplicateToFirebase:getDict "
@@ -166,9 +166,9 @@ class ReplicateToFirebase(object):
         ## input validaiton
         call_result = self.checkValues([[key_names, False, list, "len1", "unicodelist"],
                                         [all_flag,True,bool]])
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             return_msg += "input validation failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data, 'dictionary': dictionary}
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'dictionary': dictionary}
 
         if key_names is None:
             key_names = []
@@ -196,7 +196,7 @@ class ReplicateToFirebase(object):
                 fields[key] = None
 
         dictionary = fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'dictionary': dictionary}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'dictionary': dictionary}
 
     def __DsP1Users(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1Users "
@@ -209,9 +209,9 @@ class ReplicateToFirebase(object):
 
         ##we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             return_msg += "get of object attribute record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         # ndb.Model overloads the = operator so we aren't overwriting the memory location of our current function
@@ -223,9 +223,9 @@ class ReplicateToFirebase(object):
                                          'emergency_contact','email_address','firebase_uid','country_uid',
                                          'region_uid','area_uid','description','account_flags','location_cords'])
         debug_data.append(call_result)
-        if call_result['success'] != True:
+        if call_result[RDK.success] != True:
             return_msg += "failed to get entity fields dictionary"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity_fields = call_result['dictionary']
@@ -233,7 +233,7 @@ class ReplicateToFirebase(object):
 
         # only users who have the ability to authenticate with firebase have their personal information replicated to firebase
         if entity_fields['firebase_uid'] is  None:
-            return {'success': RC.success, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.success, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
 
@@ -241,7 +241,7 @@ class ReplicateToFirebase(object):
             user_uid = unicode(entity_id)
         except Exception as e:
             return_msg += "failed to parse user_uid from entity id:%s with exception:%s" % (entity_id, e)
-            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         firebase_location = "users/" + entity_fields['firebase_uid'] + "/"
@@ -304,13 +304,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting user_record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1Needs(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1Needs "
@@ -323,9 +323,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of needs record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -335,7 +335,7 @@ class ReplicateToFirebase(object):
             needs_uid = unicode(entity_id)
         except Exception as e:
             return_msg += "failed to parse user_uid from entity id:%s with exception:%s" % (entity_id, e)
-            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
 
@@ -381,13 +381,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting needs record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1CaretakerSkills(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1CaretakerSkills "
@@ -400,9 +400,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of caretaker skills record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -412,7 +412,7 @@ class ReplicateToFirebase(object):
             skill_uid = unicode(entity_id)
         except Exception as e:
             return_msg += "failed to parse user_uid from entity id:%s with exception:%s" % (entity_id, e)
-            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
 
@@ -458,13 +458,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting skills record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1SkillsSatisfiesNeeds(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1SkillsSatisfiesNeeds "
@@ -477,9 +477,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of SkillsSatisfiesNeeds record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -489,7 +489,7 @@ class ReplicateToFirebase(object):
             skill_uid = unicode(entity_id)
         except Exception as e:
             return_msg += "failed to parse user_uid from entity id:%s with exception:%s" % (entity_id, e)
-            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         firebase_location = "skills_needs_joins/{}/".format(skill_uid)
@@ -546,13 +546,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting needs_skills_joins record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1HashTags(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1HashTags "
@@ -565,9 +565,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of HashTags record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -577,7 +577,7 @@ class ReplicateToFirebase(object):
             hashtag_uid = unicode(entity_id)
         except Exception as e:
             return_msg += "failed to parse hashtag_uid from entity id:%s with exception:%s" % (entity_id, e)
-            return {'success': RC.input_validation_failed, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         firebase_location = "hashtags/{}".format(hashtag_uid)
@@ -621,13 +621,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting hashtags record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1Cluster(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1Cluster "
@@ -640,9 +640,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of Cluster record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -652,9 +652,9 @@ class ReplicateToFirebase(object):
 
         call_result = DSF.kget(user_key)
         debug_data.append(call_result)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "failed to get user of cluster {}".format(entity_id)
-            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+            return {RDK.success: RC.datastore_failure,RDK.return_msg:return_msg,RDK.debug_data:debug_data,
                 'firebase_fields': firebase_fields}
 
         needer_user = call_result['get_result']
@@ -738,13 +738,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting clusters record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1UserClusterJoins(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1UserClusterJoins "
@@ -757,9 +757,9 @@ class ReplicateToFirebase(object):
 
         # we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of Cluster record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -769,9 +769,9 @@ class ReplicateToFirebase(object):
         current_joins_user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
         call_result = DSF.kget(current_joins_user_key)
         debug_data.append(call_result)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "failed to get user of cluster joins {}".format(entity_id)
-            return {'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.datastore_failure, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         current_joins_user = call_result['get_result']
@@ -785,7 +785,7 @@ class ReplicateToFirebase(object):
         except Exception as error:
             return_msg += EF.parseException("fetching user cluster joins", error)
             return {
-                'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
+                RDK.success: RC.datastore_failure, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                 'firebase_fields': firebase_fields
             }
 
@@ -805,9 +805,9 @@ class ReplicateToFirebase(object):
 
         call_result = DSF.kget_multi(cluster_member_keys)
         debug_data.append(call_result)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "failed to get members of cluster {}".format(entity_id)
-            return {'success': RC.datastore_failure, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: RC.datastore_failure, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         cluster_members = call_result['get_result']
@@ -933,13 +933,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] is not True:
+            if data[RDK.success] is not True:
                 return_msg += "setting clusters record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1CountryCodes(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1CountryCodes "
@@ -952,9 +952,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of CountryCodes record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -990,13 +990,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting CountryCode record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1RegionCodes(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1RegionCodes "
@@ -1009,9 +1009,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of RegionCodes record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -1051,13 +1051,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting RegionCode record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1AreaCodes(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1RegionCodes "
@@ -1070,9 +1070,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of AreaCodes record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -1114,13 +1114,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting RegionCode record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1CaretakerSkillsJoins(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1CaretakerSkillsJoins "
@@ -1133,9 +1133,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of CaretakerSkillsJoins record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -1144,9 +1144,9 @@ class ReplicateToFirebase(object):
         key_pairs = entity.key.pairs()
         user_key = ndb.Key(*key_pairs[0])
         call_result = DSF.kget(user_key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of User record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         user = call_result['get_result']
@@ -1206,13 +1206,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting SkillJoins record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1SkillJoinsUnusedCapacityNow(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1SkillJoinsUnusedCapacityNow "
@@ -1225,9 +1225,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of SkillJoinsUnusedCapacityNow record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -1236,10 +1236,10 @@ class ReplicateToFirebase(object):
         # get skill joins
         joins_query = DsP1CaretakerSkillsJoins.query(DsP1CaretakerSkillsJoins.skill_uid == long(entity_id))
         call_result = DSF.kfetch(joins_query)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "fetch of skill joins failed"
             return {
-                'success': call_result['success'], 'return_msg': return_msg, 'debug_data': debug_data,
+                RDK.success: call_result[RDK.success], RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                 'firebase_fields': firebase_fields
             }
         skill_joins = call_result['fetch_result']
@@ -1252,9 +1252,9 @@ class ReplicateToFirebase(object):
 
         call_result = DSF.kget_multi(user_keys)
         debug_data.append(call_result)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "failed to get users of skill {}".format(entity_id)
-            return {'success': RC.datastore_failure,'return_msg':return_msg,'debug_data':debug_data,
+            return {RDK.success: RC.datastore_failure,RDK.return_msg:return_msg,RDK.debug_data:debug_data,
                 'firebase_fields': firebase_fields}
         #</end> get users
 
@@ -1289,13 +1289,13 @@ class ReplicateToFirebase(object):
 
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting unused_capacity_now record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1Needer(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1Needer "
@@ -1308,9 +1308,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of Needer record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -1318,15 +1318,15 @@ class ReplicateToFirebase(object):
 
         user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
         call_result = DSF.kget(user_key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of user record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         user = call_result['get_result']
 
         if not user.firebase_uid:
-            return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+            return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
         firebase_location = "users/{}/needers/".format(user.firebase_uid)
 
@@ -1354,15 +1354,48 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
 
+        cluster_pointer_query = DsP1ClusterPointer.query(ancestor=user_key)
+        call_result = DSF.kfetch(cluster_pointer_query)
+        debug_data.append(call_result)
+        if call_result[RDK.success] != RC.success:
+            return_msg += "fetch of cluster_pointer records failed"
+            return {RDK.success: RC.datastore_failure, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
+                    'firebase_fields': firebase_fields}
+
+        cluster_pointers = call_result['fetch_result']
+        for cluster_pointer in cluster_pointers:
+            firebase_location = "clusters/{}/needer/".format(cluster_pointer.cluster_uid)
+            simple_entries = [
+                ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
+                ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
+                ["", FF.keys.needer_uid, entity_id],
+                # The remaining entries will be filled when __DsP1NeederNeedsJoins executed on p1s2t4
+            ]
+            for entry in simple_entries:
+                if entry[2] is None:
+                    continue
+
+                firebase_entry = FF()
+                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                            FF.object_types.object,
+                                                            FF.functions.update,
+                                                            entry[2],
+                                                            entry[1])
+                debug_data.append(call_result)
+                call_result = firebase_entry.toDict()
+                debug_data.append(call_result)
+                generated_fields.append(call_result['field'])
+                debug_data_count = debug_data_count + 2
+
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting needer record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
     def __DsP1NeederNeedsJoins(self, entity_id, entity, delete_flag=False):
         return_msg = "ReplicateToFirebase:__DsP1NeederNeedsJoins "
@@ -1375,9 +1408,9 @@ class ReplicateToFirebase(object):
 
         #we need to get all the values in the record we are updating so we can put all needed info in firebase
         call_result = entity.kget(entity.key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of Needer record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         entity = call_result['get_result']
@@ -1385,24 +1418,25 @@ class ReplicateToFirebase(object):
 
         user_key = ndb.Key(DsP1Users._get_kind(), long(entity.user_uid))
         call_result = DSF.kget(user_key)
-        if call_result['success'] != RC.success:
+        if call_result[RDK.success] != RC.success:
             return_msg += "get of user record failed"
-            return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                     'firebase_fields': firebase_fields}
 
         user = call_result['get_result']
         if not user.firebase_uid:
-            return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+            return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
         firebase_location = "users/{}/needers/".format(user.firebase_uid)
 
         last_updated = unicode(int(time.time()))
         needer_uid_str = unicode(entity.needer_uid)
+        needer_need_uid_str = "{}/{}".format(entity.needer_uid, entity.need_uid)
         simple_entries = [
             ["", FF.keys.last_updated, last_updated],
             [needer_uid_str, FF.keys.last_updated, "deleted" if delete_flag else last_updated],
-            [needer_uid_str, FF.keys.need_uid, unicode(entity.need_uid)],
-            [needer_uid_str, FF.keys.special_notes, entity.special_requests],
+            [needer_need_uid_str, FF.keys.need_uid, unicode(entity.need_uid)],
+            [needer_need_uid_str, FF.keys.special_notes, entity.special_requests],
         ]
 
         for entry in simple_entries:
@@ -1421,15 +1455,61 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
 
+        cluster_pointer_query = DsP1ClusterPointer.query(ancestor=user_key)
+        call_result = DSF.kfetch(cluster_pointer_query)
+        debug_data.append(call_result)
+        if call_result[RDK.success] != RC.success:
+            return_msg += "fetch of cluster_pointer records failed"
+            return {RDK.success: RC.datastore_failure, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
+                    'firebase_fields': firebase_fields}
+
+        need_uid_str = unicode(entity.need_uid)
+        cluster_pointers = call_result['fetch_result']
+        for cluster_pointer in cluster_pointers:
+            firebase_location = "clusters/{}/needer/needs_uids/".format(cluster_pointer.cluster_uid)
+            simple_entries = [
+                ["", FF.keys.last_updated, last_updated],
+            ]
+            for entry in simple_entries:
+                if entry[2] is None:
+                    continue
+
+                firebase_entry = FF()
+                call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                            FF.object_types.object,
+                                                            FF.functions.update,
+                                                            entry[2],
+                                                            entry[1])
+                debug_data.append(call_result)
+                call_result = firebase_entry.toDict()
+                debug_data.append(call_result)
+                generated_fields.append(call_result['field'])
+                debug_data_count = debug_data_count + 2
+
+            ## add need_uid
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location,
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        "deleted" if delete_flag else need_uid_str)
+            debug_data.append(call_result)
+            call_result = firebase_entry.setManualKey(need_uid_str)
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+            ##</end> add need_uid
+
         debug_data_count = debug_data_count * -1
         for data in debug_data[debug_data_count:]:
-            if data['success'] != RC.success:
+            if data[RDK.success] != RC.success:
                 return_msg += "setting NeederNeedsJoins record or type record failed"
-                return {'success': False, 'return_msg': return_msg, 'debug_data': debug_data,
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
         firebase_fields = generated_fields
-        return {'success': True, 'return_msg': return_msg, 'debug_data': debug_data, 'firebase_fields': firebase_fields}
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
 
 
 class DsP1UserPointers(ndb.Model, DSF):
