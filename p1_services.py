@@ -95,6 +95,7 @@ class TaskArguments(object):
     s2t10_account_flags = 'p1s2t10_account_flags'
     s2t10_location_cord_lat = 'p1s2t10_location_cord_lat'
     s2t10_location_cord_long = 'p1s2t10_location_cord_long'
+    s2t10_gender = 'p1s2t10_gender'
 
     s2t11_skill_uid = 'p1s2t11_skill_uid'
     s2t11_need_uid = 'p1s2t11_need_uid'
@@ -129,6 +130,7 @@ class TaskArguments(object):
     s3t4_account_flags = 'p1s3t4_account_flags'
     s3t4_location_cord_long = 'p1s3t4_location_cord_long'
     s3t4_location_cord_lat = 'p1s3t4_location_cord_lat'
+    s3t4_gender = 'p1s3t4_gender'
 
     s3t6_skill_name = 'p1s3t6_skill_name'
     s3t6_description = 'p1s3t6_description'
