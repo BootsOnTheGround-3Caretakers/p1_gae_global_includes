@@ -219,9 +219,11 @@ class ReplicateToFirebase(object):
         ##</end>we need to get all the values in the record we are updating so we can put all needed info in firebase
 
         ## get all those values into a dictionary for easier access
-        call_result = self.getDict(self,['first_name','last_name','phone_1','phone_texts','phone_2',
-                                         'emergency_contact','email_address','firebase_uid','country_uid',
-                                         'region_uid','area_uid','description','account_flags','location_cords'])
+        call_result = self.getDict(self,[
+            'first_name','last_name','phone_1','phone_texts','phone_2',
+            'emergency_contact','email_address','firebase_uid','country_uid',
+            'region_uid','area_uid','description','account_flags','location_cords', 'gender',
+        ])
         debug_data.append(call_result)
         if call_result[RDK.success] != True:
             return_msg += "failed to get entity fields dictionary"
@@ -259,6 +261,7 @@ class ReplicateToFirebase(object):
             ["", FF.keys.country_uid, entity_fields['country_uid']],
             ["", FF.keys.region_uid, entity_fields['region_uid']],
             ["", FF.keys.area_uid, entity_fields['area_uid']],
+            ["", FF.keys.gender, entity_fields['gender']],
             ["", FF.keys.deletion_prevention_key,  FF.keys.deletion_prevention_key],
             ["clusters/", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
             ["needers/", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
@@ -277,8 +280,8 @@ class ReplicateToFirebase(object):
                 return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
-            simple_entries.append(["", FF.keys.location_cord_long, cord_long])
-            simple_entries.append(["", FF.keys.location_cord_lat, cord_lat])
+            simple_entries.append(["", FF.keys.location_cord_long, unicode(cord_long)])
+            simple_entries.append(["", FF.keys.location_cord_lat, unicode(cord_lat)])
 
         #last updated timestamp needs to be the last thing replicated
         simple_entries.append(["", FF.keys.last_updated, unicode(int(time.time()))])
@@ -1550,6 +1553,8 @@ class DsP1Users(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     _rule_account_flags = [False, unicode, "len1"]
     location_cords = ndb.GeoPtProperty(required=False)  # Please double check this. Serializes to '<lat>, <lon>' in ranges [-90,90] and [-180,180]
     _rule_location_cords = [False, ndb.GeoPt]
+    gender = ndb.StringProperty(required=False)
+    _rule_gender = [False, unicode, "len1"]
 
 class DsP1CaretakerSkillsJoins(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.IntegerProperty(required=True)
