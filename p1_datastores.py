@@ -273,8 +273,8 @@ class ReplicateToFirebase(object):
             cord_long = 0
             cord_lat = 0
             try:
-                cord_long = entity_fields["location_cords"].longitude
-                cord_lat = entity_fields["location_cords"].latitude
+                cord_long = entity_fields["location_cords"].lon
+                cord_lat = entity_fields["location_cords"].lat
             except Exception as error:
                 return_msg += EF.parseException("getting long/lat",error,entity_fields["location_cords"])
                 return {RDK.success: RC.input_validation_failed, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
