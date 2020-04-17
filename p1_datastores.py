@@ -80,6 +80,7 @@ class ReplicateToFirebase(object):
             "DsP1CaretakerSkills": self.__DsP1CaretakerSkills,
             "DsP1SkillsSatisfiesNeeds": self.__DsP1SkillsSatisfiesNeeds,
             "DsP1HashTags": self.__DsP1HashTags,
+            "DsP1HashTagPointer": self.__DsP1HashTagPointer,
             "DsP1Cluster": self.__DsP1Cluster,
             "DsP1UserClusterJoins": self.__DsP1UserClusterJoins,
             "DsP1CountryCodes": self.__DsP1CountryCodes,
@@ -626,6 +627,56 @@ class ReplicateToFirebase(object):
         for data in debug_data[debug_data_count:]:
             if data[RDK.success] is not True:
                 return_msg += "setting hashtags record or type record failed"
+                return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
+                        'firebase_fields': firebase_fields}
+
+        firebase_fields = generated_fields
+        return {RDK.success: True, RDK.return_msg: return_msg, RDK.debug_data: debug_data, 'firebase_fields': firebase_fields}
+
+    def __DsP1HashTagPointer(self, entity_id, entity, delete_flag=False):
+        return_msg = "ReplicateToFirebase:__DsP1HashTagPointer "
+        debug_data = []
+        call_result = {}
+        firebase_fields = []
+
+        debug_data_count = 0
+        generated_fields = []
+
+        #we need to get all the values in the record we are updating so we can put all needed info in firebase
+        call_result = entity.kget(entity.key)
+        if call_result[RDK.success] != RC.success:
+            return_msg += "get of HashTags record failed"
+            return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
+                    'firebase_fields': firebase_fields}
+
+        entity = call_result['get_result']
+        #</end> we need to get all the values in the record we are updating so we can put all needed info in firebase
+
+        key_pairs = entity.key.pairs()
+        user_uid = key_pairs[0][1]
+        hashtag_uid = key_pairs[1][1]
+        firebase_location = "user_hashtag_joins/{}/".format(hashtag_uid)
+        user_uid_str = unicode(user_uid)
+
+        # set user_hashtag_joins
+        firebase_entry = FF()
+        call_result = firebase_entry.setFieldValues(firebase_location,
+                                                    FF.object_types.object,
+                                                    FF.functions.update,
+                                                    "deleted" if delete_flag else user_uid_str)
+        debug_data.append(call_result)
+        call_result = firebase_entry.setManualKey(user_uid_str)
+        debug_data.append(call_result)
+        call_result = firebase_entry.toDict()
+        debug_data.append(call_result)
+        generated_fields.append(call_result['field'])
+        debug_data_count = debug_data_count + 2
+        #</end> set user_hashtag_joins
+
+        debug_data_count = debug_data_count * -1
+        for data in debug_data[debug_data_count:]:
+            if data[RDK.success] is not True:
+                return_msg += "setting user_hashtag_joins record or type record failed"
                 return {RDK.success: False, RDK.return_msg: return_msg, RDK.debug_data: debug_data,
                         'firebase_fields': firebase_fields}
 
@@ -1669,7 +1720,7 @@ class DsP1HashTags(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase)
     description = ndb.TextProperty(required=False)
     _rule_description = [False, unicode, "len1"]
 
-class DsP1HashTagPointer(ndb.Model, DSF):
+class DsP1HashTagPointer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     hashtag_uid = ndb.IntegerProperty(required=True)
     _rule_hashtag_uid = [True, long, "bigint", "greater0"]
 
