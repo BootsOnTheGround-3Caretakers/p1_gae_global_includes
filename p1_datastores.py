@@ -1408,6 +1408,29 @@ class ReplicateToFirebase(object):
             generated_fields.append(call_result['field'])
             debug_data_count = debug_data_count + 2
 
+        firebase_location = "users/{}/clusters/".format(user.firebase_uid)
+        simple_entries = [
+            ["", FF.keys.last_updated, last_updated],
+            ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
+            ["", FF.keys.private_metadata, entity.private_metadata_blob],
+        ]
+
+        for entry in simple_entries:
+            if entry[2] is None:
+                continue
+
+            firebase_entry = FF()
+            call_result = firebase_entry.setFieldValues(firebase_location + entry[0],
+                                                        FF.object_types.object,
+                                                        FF.functions.update,
+                                                        entry[2],
+                                                        entry[1])
+            debug_data.append(call_result)
+            call_result = firebase_entry.toDict()
+            debug_data.append(call_result)
+            generated_fields.append(call_result['field'])
+            debug_data_count = debug_data_count + 2
+
         cluster_pointer_query = DsP1ClusterPointer.query(ancestor=user_key)
         call_result = DSF.kfetch(cluster_pointer_query)
         debug_data.append(call_result)
@@ -1418,11 +1441,12 @@ class ReplicateToFirebase(object):
 
         cluster_pointers = call_result['fetch_result']
         for cluster_pointer in cluster_pointers:
-            firebase_location = "clusters/{}/needer/".format(cluster_pointer.cluster_uid)
+            firebase_location = "clusters/{}/".format(cluster_pointer.cluster_uid)
             simple_entries = [
-                ["", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
-                ["", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
-                ["", FF.keys.needer_uid, entity_id],
+                ["", FF.keys.public_metadata, entity.public_metadata_blob],
+                ["needer", FF.keys.last_updated, "deleted" if delete_flag else last_updated],
+                ["needer", FF.keys.deletion_prevention_key, FF.keys.deletion_prevention_key],
+                ["needer", FF.keys.needer_uid, entity_id],
                 # The remaining entries will be filled when __DsP1NeederNeedsJoins executed on p1s2t4
             ]
             for entry in simple_entries:
@@ -1705,6 +1729,10 @@ class DsP1Needs(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
 class DsP1Needer(ndb.Model, DSF, ReplicateToFirebaseFlag, ReplicateToFirebase):
     user_uid = ndb.IntegerProperty(required=True)
     _rule_user_uid = [True, long, "bigint", "greater0"]
+    public_metadata_blob = ndb.TextProperty(required=False)
+    _rule_public_metadata_blob = [False, unicode, "len1"]
+    private_metadata_blob = ndb.TextProperty(required=False)
+    _rule_private_metadata_blob = [False, unicode, "len1"]
 
 class DsP1CreatedUidsLog(ndb.Model, DSF):
     model_name = ndb.BooleanProperty(required=True)
