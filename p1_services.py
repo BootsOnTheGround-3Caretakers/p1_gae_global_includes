@@ -21,6 +21,9 @@ class TaskArguments(object):
     s1t2_description = 'p1s1t2_description'
 
     s1t3_user_uid = 'p1s1t3_user_uid'
+    s1t3_needer_uid = 'p1s1t3_needer_uid'
+    s1t3_private_metadata = 'p1s1t3_private_metadata'
+    s1t3_public_metadata = 'p1s1t3_public_metadata'
 
     s1t4_first_name = 'p1s1t4_first_name'
     s1t4_last_name = 'p1s1t4_last_name'
@@ -100,6 +103,10 @@ class TaskArguments(object):
     s2t11_skill_uid = 'p1s2t11_skill_uid'
     s2t11_need_uid = 'p1s2t11_need_uid'
 
+    s2t12_user_uid = 'p1s2t12_user_uid'
+    s2t12_need_join_uid = 'p1s2t12_need_join_uid'
+    s2t12_needer_uid = 'p1s2t12_needer_uid'
+
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
 
@@ -156,6 +163,9 @@ class TaskArguments(object):
     s3t11_description = 'p1s3t11_description'
 
     s3t12_user_uid = 'p1s3t12_user_uid'
+    s3t12_needer_uid = 'p1s3t12_needer_uid'
+    s3t12_private_metadata = 'p1s3t12_private_metadata'
+    s3t12_public_metadata = 'p1s3t12_public_metadata'
 
     s3t13_user_uid = 'p1s3t13_user_uid'
     s3t13_hashtag_uid = 'p1s3t13_hashtag_uid'
@@ -201,9 +211,10 @@ class TaskNames(object):
     s2t9 = 'p1s2t9-remove-skill-from-user'
     s2t10 = 'p1s2t10-modify-user-information'
     s2t11 = 'p1s2t11-associate-skill-with-need'
+    s2t12 = 'p1s2t12-modify-needer-need-join'
 
     s3t1 = 'p1s3t1-create-need'
-    s3t2 = 'p1s3t2-assign-need-to-needer'
+    s3t2 = 'p1s3t2-create-modify-need-to-needer-join'
     s3t3 = 'p1s3t3-create-user'
     s3t4 = 'p1s3t4-modify-user-information'
     s3t6 = 'p1s3t6-create-skill'
@@ -212,7 +223,7 @@ class TaskNames(object):
     s3t9 = 'p1s3t9-add-modify-user-to-existing-cluster'
     s3t10 = 'p1s3t10-remove-user-from-cluster'
     s3t11 = 'p1s3t11-add-hashtag'
-    s3t12 = 'p1s3t12-create-needer-request'
+    s3t12 = 'p1s3t12-create-modify-needer-request'
     s3t13 = 'p1s3t13-assign-user-hashtag'
     s3t14 = 'p1s3t14-remove-user-hashtag'
 
@@ -405,10 +416,18 @@ class ModifyJoins(ServiceInformation):
     associate_skill_with_need.ACL_rules = ""
     associate_skill_with_need.user_uid = 1
 
+    modify_needer_need_join = TaskInformation()
+    modify_needer_need_join.id = "t12"
+    modify_needer_need_join.method = "POST"
+    modify_needer_need_join.name = TaskNames.s2t12
+    modify_needer_need_join.url = "/" + TaskNames.s2t12
+    modify_needer_need_join.ACL_rules = ""
+    modify_needer_need_join.user_uid = 1
+
     task_list = [
         add_modify_cluster_user, remove_user_from_cluster, add_modify_user_skill, add_modify_need_to_needer,
         remove_need_from_needer, remove_needer_from_user, assign_hashtag_to_user, remove_hashtag_from_user,
-        remove_skill_from_user, modify_user_information, associate_skill_with_need,
+        remove_skill_from_user, modify_user_information, associate_skill_with_need, modify_needer_need_join,
     ]
 
 
@@ -498,13 +517,13 @@ class WebRequests(ServiceInformation):
     add_hashtag.ACL_rules = ""
     add_hashtag.user_uid = 1
 
-    create_needer_request = PageServer()
-    create_needer_request.id = "t12"
-    create_needer_request.method = "POST"
-    create_needer_request.name = TaskNames.s3t12
-    create_needer_request.url = "/" + TaskNames.s3t12
-    create_needer_request.ACL_rules = ""
-    create_needer_request.user_uid = 1
+    create_modify_needer_request = PageServer()
+    create_modify_needer_request.id = "t12"
+    create_modify_needer_request.method = "POST"
+    create_modify_needer_request.name = TaskNames.s3t12
+    create_modify_needer_request.url = "/" + TaskNames.s3t12
+    create_modify_needer_request.ACL_rules = ""
+    create_modify_needer_request.user_uid = 1
 
     assign_user_hashtag = PageServer()
     assign_user_hashtag.id = "t13"
@@ -525,7 +544,7 @@ class WebRequests(ServiceInformation):
     task_list = [
         create_need, assign_need_to_needer, create_user, modify_user_information, create_skill, add_skill_to_user,
         create_cluster, add_modify_user_to_existing_cluster, remove_user_from_cluster, add_hashtag,
-        create_needer_request, assign_user_hashtag, remove_user_hashtag,
+        create_modify_needer_request, assign_user_hashtag, remove_user_hashtag,
     ]
 
 
