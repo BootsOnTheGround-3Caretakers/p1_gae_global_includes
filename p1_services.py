@@ -104,8 +104,9 @@ class TaskArguments(object):
     s2t11_need_uid = 'p1s2t11_need_uid'
 
     s2t12_user_uid = 'p1s2t12_user_uid'
-    s2t12_need_join_uid = 'p1s2t12_need_join_uid'
     s2t12_needer_uid = 'p1s2t12_needer_uid'
+    s2t12_private_metadata = 'p1s2t12_private_metadata'
+    s2t12_public_metadata = 'p1s2t12_public_metadata'
 
     s3t1_name = 'p1s3t1_name'
     s3t1_requirements = 'p1s3t1_requirements'
@@ -211,7 +212,7 @@ class TaskNames(object):
     s2t9 = 'p1s2t9-remove-skill-from-user'
     s2t10 = 'p1s2t10-modify-user-information'
     s2t11 = 'p1s2t11-associate-skill-with-need'
-    s2t12 = 'p1s2t12-modify-needer-need-join'
+    s2t12 = 'p1s2t12-modify-needer'
 
     s3t1 = 'p1s3t1-create-need'
     s3t2 = 'p1s3t2-create-modify-need-to-needer-join'
@@ -416,18 +417,18 @@ class ModifyJoins(ServiceInformation):
     associate_skill_with_need.ACL_rules = ""
     associate_skill_with_need.user_uid = 1
 
-    modify_needer_need_join = TaskInformation()
-    modify_needer_need_join.id = "t12"
-    modify_needer_need_join.method = "POST"
-    modify_needer_need_join.name = TaskNames.s2t12
-    modify_needer_need_join.url = "/" + TaskNames.s2t12
-    modify_needer_need_join.ACL_rules = ""
-    modify_needer_need_join.user_uid = 1
+    modify_needer = TaskInformation()
+    modify_needer.id = "t12"
+    modify_needer.method = "POST"
+    modify_needer.name = TaskNames.s2t12
+    modify_needer.url = "/" + TaskNames.s2t12
+    modify_needer.ACL_rules = ""
+    modify_needer.user_uid = 1
 
     task_list = [
         add_modify_cluster_user, remove_user_from_cluster, add_modify_user_skill, add_modify_need_to_needer,
         remove_need_from_needer, remove_needer_from_user, assign_hashtag_to_user, remove_hashtag_from_user,
-        remove_skill_from_user, modify_user_information, associate_skill_with_need, modify_needer_need_join,
+        remove_skill_from_user, modify_user_information, associate_skill_with_need, modify_needer,
     ]
 
 
